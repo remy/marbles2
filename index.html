@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="loading">
+<html>
 <head>
 <meta id="meta" name="viewport" content="width=320; user-scalable=no" />
 <meta charset=utf-8 />
@@ -52,9 +52,8 @@ var $ = xui,
     $retryboard = $('#retryboard'),
     $playagain = $('#playagain'),
     $marbles,
-    playedBefore = localStorage ? localStorage.getItem('playedBefore') : null,
-    click = new Media('click.wav');
-
+    playedBefore = localStorage ? localStorage.getItem('playedBefore') : null;
+    
 Marbles.move = function (x, y, tagged, type) {
   var i = x + (Marbles.width * y);
   $marbles[x + (Marbles.width * y)].className = colours[type] || 'empty';
@@ -136,7 +135,6 @@ function selectMarble(event) {
     
     m.tag();
     if (Marbles.activeTags) {
-      click.play();
       Marbles.clear();      
     }
   }
@@ -234,9 +232,9 @@ $retryboard.on('touchstart', retryboard).on('click', retryboard);
 $grid.on('touchstart', selectMarble).on('click', selectMarble);
 
 $('#levelup').on('touchstart', levelUpNewGame).on('click', levelUpNewGame);
-$(document).on('deviceready', function () {
-  phonegap = true;
-});
+// $(document).on('deviceready', function () {
+//   phonegap = true;
+// });
 
 // lame :(
 var phonegap = (window.innerHeight == 460 && !navigator.standalone) ? 1 : false;
@@ -247,26 +245,16 @@ if (!phonegap && /iphone/i.test(navigator.userAgent) && !navigator.standalone &&
   document.body.className = 'saveToSpring';
   $(document).on('touchstart', removeSave).on('click', removeSave);
   initDraw({}, true);
-  // $('#overlay').tween({ opacity: 0 }, { duration: 500 } );
 } else {
   // Run!
   initDraw({}, true);
-  // $('#overlay').tween({ opacity: 0 }, { duration: 2000, callback: function () {
-  // }});
 }
 
-if (phonegap || navigator.standalone) {
-  $('body').tween({ opacity: 1 }, { duration: 500, callback: function () {
-    setTimeout(startTimer, 500);
-  } });
-} else {
-  document.getElementsByTagName('html')[0].className = '';
-  setTimeout(startTimer, 500);
-}
+setTimeout(startTimer, 500);
+
 
 // scroll the url bar out of view
 setTimeout(function () {
-  // $('html').removeClass('loading');
   window.scrollTo(0, 1);
 }, 10);
 })();
