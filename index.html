@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="loading">
+<head>
+<meta id="meta" name="viewport" content="width=320; user-scalable=no" />
+<meta charset=utf-8 />
+<title>Marbles²</title>
+<link href='marbles-squared.png' rel='apple-touch-icon' />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link href='Default.png' rel='apple-touch-startup-image' />
+<link rel="stylesheet" href="master.css" type="text/css" />
+</head>
+<body>
+<div id="overlay"></div>
+<div class="toolbar">
+  <a href="#" class="buttom" id="start">Start again</a>
+</div>
+<div selected="true" id="grid"></div>
+<div id="levelup">
+  <p>Congratulations!</p>
+  <p>Starting new board in<span id="newGameCountdown">3</span></p>
+</div>
+<div id="replay">
+  <p>You lose!</p>
+  <a id="playagain" href="/marbles/">Play again</a>
+  <a id="retryboard" href="/marbles/">Retry board</a>
+</div>
+<div id="status" class="toolbar">
+  <span id="score">Score: 0</span>
+  <span id="potential">Level: 1</span>
+</div>
+<div id="saveToSpring"></div>
+<div id="timer" class="toolbar"></div>
+<script src="xui-core-1.0.0.min.js"></script>
+<script src="xui-anim.js"></script>
+<script src="phonegap.js"></script>
+<script src="marbles.js"></script>
+<script>
+(function () {
+var $ = xui, 
+    bonusTimer, 
+    levelUpTimer = null,
+    $potential = $('#potential'),
+    gameActive = false,
+    colours = ['empty', 'one', 'two', 'three', 'four'],
+    $grid = $('#grid'),
+    n = 7, 
+    // dimension information - 10x10 grid, 4 types (red)
+    dim = { grid: [n,n], types: 3, marble: [~~(320/n),~~(320/n)] },
+    $score = $('#score'),
+    $start = $('#start'),
+    $retryboard = $('#retryboard'),
+    $playagain = $('#playagain'),
+    $marbles,
+    playedBefore = localStorage ? localStorage.getItem('playedBefore') : null,
+    click = new Media('click.wav');
+
+Marbles.move = function (x, y, tagged, type) {
+  var i = x + (Marbles.width * y);
+  $marbles[x + (Marbles.width * y)].className = colours[type] || 'empty';
+  if (tagged) $marbles[i].className += ' selected';
+};
+    
+function initDraw(event, noTimer) {
+  clearInterval(levelUpTimer); // just in case
+  $potential.html('Level: ' + Marbles.level);
+  Marbles.init(dim.grid[0], dim.grid[1], dim.types);
+  $grid.find('div').each(function () {
+    this.parentNode.removeChild(this);
+  });
+  
+  $('body').removeClass('gameover');  
+  
+  // rebuild
+  var h = parseInt(Marbles.height * dim.marble[1]), w = parseInt(Marbles.width * dim.marble[0]);
+  $grid.css({ 'width': w, 'height': h });
+  $('#grid').css('width', w);
+  Marbles.loop(function (x,y) {
+    var m = Marbles.get(x,y);
+    var d = document.createElement('div');
+    d.x = x;
+    d.y = y;
+    d.className = colours[m.type]; // should never be tagged during this point
+    $grid[0].appendChild(d);
+    $(d).css({ 
+      'background': colours[m.tagged ? '-' : m.type], 
+      'left': parseInt(x * dim.marble[0]) + 'px',
+      'top': parseInt(h - dim.marble[1] - (y * dim.marble[1])) + 'px'
+    });
+  });
+  $marbles = $grid.find('div');
+  
+  gameActive = true;
+  $score.html('Score: ' + Marbles.getScore());
+  
+  event && event.preventDefault && event.preventDefault();
+  event && event.stopPropagation && event.stopPropagation();
+  
+  if (!noTimer) startTimer();
+  
+  return false;
+}
+
+function newTimer(width) {
+  var countdown = $('#timer')[0], newCountdown = document.createElement('div');
+  newCountdown.setAttribute('id', 'timer');
+  if (width) newCountdown.style.width = width;
+  // newCountdown.innerHTML = '<span>Bonus</span>';
+  newCountdown.className = 'toolbar';
+  
+  document.body.appendChild(newCountdown);
+  countdown.parentNode.removeChild(countdown);  
+}
+
+function startTimer() {
+  // reset
+  newTimer();  
+  $('#timer').tween({ width : 0 + 'px' }, { duration: 10 * 1000, easing: 'linear', callback: function () {
+    Marbles.bonusFinished();
+  }});
+}
+
+function stopTimer() {
+  newTimer(getComputedStyle(document.getElementById('timer'), null).width);
+}
+
+function selectMarble(event) {
+  event && event.preventDefault && event.preventDefault();
+  event && event.stopPropagation && event.stopPropagation();
+  if (!gameActive) return;
+
+  var t = event.target, 
+      m = Marbles.get(t.x, t.y);
+
+  if (m) {
+    
+    m.tag();
+    if (Marbles.activeTags) {
+      click.play();
+      Marbles.clear();      
+    }
+  }
+
+  $score.html('Score: ' + Marbles.getScore());
+  var movesLeft = Marbles.movesLeft();
+  
+  if (movesLeft === 0) {
+    stopTimer();
+  }
+  
+  if (movesLeft === 0 && Marbles.marblesLeft() !== 0) {
+    $('body').addClass('gameover');
+    gameActive = false;
+    // alert('Game Over\nSeed: ' + Marbles.seed());
+  } else if (movesLeft === 0 && Marbles.marblesLeft() === 0) {
+    // next level
+    Marbles.levelUp();
+    // alert('Congratulations!\nMoving to level ' + Marbles.level);
+    $('body').addClass('levelup');
+    levelUpTimer = setInterval(function () {
+      var countdown = $('#newGameCountdown')[0];
+      if (countdown.innerHTML == 0) {
+        $('body').removeClass('levelup');
+        countdown.innerHTML = '3';
+        clearInterval(levelUpTimer);
+        initDraw();
+      } else {
+        countdown.innerHTML = countdown.innerHTML - 1;
+      }
+    }, 1000);
+  }
+}
+
+// broken in PhoneGap 0.8.3
+// var wide = document.createElement('meta');
+// wide.setAttribute('id','meta');
+// wide.setAttribute('name', 'viewport');
+// wide.setAttribute('content', 'width=720; user-scalable=no');
+// 
+// var narrow = document.createElement('meta');
+// narrow.setAttribute('id','meta');
+// narrow.setAttribute('name', 'viewport');
+// narrow.setAttribute('content', 'width=320; user-scalable=no');
+
+document.addEventListener('orientationchange', function(e) { 
+  // alert("Orientation changed to " + window.orientation); 
+  // var meta = document.getElementById('meta');
+  // meta.parentNode.removeChild(meta);
+  // document.getElementsByTagName('head')[0].appendChild(window.orientation === 0 ? narrow : wide);
+  setTimeout(function () {
+    window.scrollTo(0, 1);
+  }, 10);
+  
+  // <meta name="viewport" content="width=720; user-scalable=no" />
+}, false);
+
+// play again
+function newGame(event) {
+  Marbles.newGame();
+  return initDraw(event);
+}
+
+function retryboard(e) {
+  Marbles.seed(Marbles.seed());
+  Marbles.newGame();
+  return initDraw(e);
+}
+
+function levelUpNewGame() {
+  clearInterval(levelUpTimer);
+  $('body').removeClass('levelup');
+  $('#newGameCountdown')[0].innerHTML = '3';
+  initDraw();
+}
+
+function alert(str) {
+  if (navigator.notification && navigator.notification.alert) {
+    navigator.notification.alert(str, "Marbles Squared", "OK");
+  } else {
+    window.alert(str);
+  }
+}
+
+function removeSave(event) {
+  document.body.className = '';
+  startTimer();
+  event && event.preventDefault && event.preventDefault();
+}
+
+// event hook up
+$start.on('touchstart', newGame).on('click', newGame);
+$playagain.on('touchstart', newGame).on('click', newGame);
+$retryboard.on('touchstart', retryboard).on('click', retryboard);
+$grid.on('touchstart', selectMarble).on('click', selectMarble);
+
+$('#levelup').on('touchstart', levelUpNewGame).on('click', levelUpNewGame);
+$(document).on('deviceready', function () {
+  phonegap = true;
+});
+
+// lame :(
+var phonegap = (window.innerHeight == 460 && !navigator.standalone) ? 1 : false;
+
+// horrible, but adds a tiny bit of nice ux
+if (!phonegap && /iphone/i.test(navigator.userAgent) && !navigator.standalone && !playedBefore ) {
+  localStorage.setItem('playedBefore', true);
+  document.body.className = 'saveToSpring';
+  $(document).on('touchstart', removeSave).on('click', removeSave);
+  initDraw({}, true);
+  // $('#overlay').tween({ opacity: 0 }, { duration: 500 } );
+} else {
+  // Run!
+  initDraw({}, true);
+  // $('#overlay').tween({ opacity: 0 }, { duration: 2000, callback: function () {
+  // }});
+}
+
+if (phonegap || navigator.standalone) {
+  $('body').tween({ opacity: 1 }, { duration: 500, callback: function () {
+    setTimeout(startTimer, 500);
+  } });
+} else {
+  document.getElementsByTagName('html')[0].className = '';
+  setTimeout(startTimer, 500);
+}
+
+// scroll the url bar out of view
+setTimeout(function () {
+  // $('html').removeClass('loading');
+  window.scrollTo(0, 1);
+}, 10);
+})();
+</script>
+</body>
+</html>
