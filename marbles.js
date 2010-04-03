@@ -5,31 +5,6 @@
 	@description: Marbles Squared game based directly on Marbles Squared for Palm OS
 */
 
-
-var Utils = (function () {
-  var RandSeed = ~~(+new Date / 1000); // ditch the milliseconds
-  
-  // Rand32B
-  function random() { // different sequence to Math.random()
-    var T16 = 0x10000, T32 = T16*T16,
-        cons = 0x0808, tant = 0x8405, // cons*T16 + tant = 134775813
-        X = RandSeed*cons % T16 * T16 + RandSeed*tant + 1; // Exact 32=bit arithmetic
-    return (RandSeed = X % T32) / T32; 
-  }
-  
-  return {
-    random: random,
-    seed: function (seed) {
-      if (seed === true) {
-        RandSeed = ~~(+new Date / 1000);
-      } else if (seed !== undefined) {
-        RandSeed = seed;
-      }
-      return RandSeed;
-    }
-  };
-})();
-
 var Marble = function (x, y, type, tagged) {  
   if (!tagged) tagged = false;
 
@@ -37,13 +12,6 @@ var Marble = function (x, y, type, tagged) {
   this.y = y;
   this.type = type;
   this.tagged = tagged;
-
-  /*
-    left: null,
-    right: null,
-    up: null,
-    down: null,
-  */
 };
 
 Marble.prototype.info = function () {
@@ -59,16 +27,39 @@ Marble.prototype.copy = function () {
   return mb;
 };
 Marble.prototype.tag = function (fn) {
+  Marbles.history.tagged[Marbles.level].push([this.x,this.y]);
   return (Marbles.activeTags ? false : Marbles.tag(this.x, this.y, fn));
 };
 Marble.prototype.hasPartner = function() {
   return !!(this.right || this.up || this.left || this.down);
 };
 
-
-
 // global marbles object
 var Marbles = (function (undefined) {
+  var Utils = (function (undefined) {
+    var RandSeed = ~~(+new Date / 1000); // ditch the milliseconds
+
+    // Rand32B
+    function random() { // different sequence to Math.random()
+      var T16 = 0x10000, T32 = T16*T16,
+          cons = 0x0808, tant = 0x8405, // cons*T16 + tant = 134775813
+          X = RandSeed*cons % T16 * T16 + RandSeed*tant + 1; // Exact 32=bit arithmetic
+      return (RandSeed = X % T32) / T32; 
+    }
+
+    return {
+      random: random,
+      seed: function (seed) {
+        if (seed === true) {
+          RandSeed = ~~(+new Date / 1000);
+        } else if (seed !== undefined) {
+          RandSeed = seed;
+        }
+        return RandSeed;
+      }
+    };
+  })();
+  
   function getMarble(x, y) {
     return marbles[x] && marbles[x][y] ? marbles[x][y] : null;
   }
@@ -82,12 +73,26 @@ var Marbles = (function (undefined) {
       taggedCount = 0,
       mygo = true,
       timeBonus = 1000,
-      seed = Utils.seed();
+      seed = Utils.seed(),
+      gameoverCallback = null;
 
   return {
     activeTags: false,
     allowSingles: false,
     level: 1,
+    history: { tagged: {1:[]}, seed: seed.toString(16).toUpperCase(), score: score, level: 1 }, // use to submit scores to the server
+    gameover: function (fn) {
+      if (typeof fn == 'function') {
+        gameoverCallback = fn;
+        return this;
+      }
+      
+      this.history.score = this.getScore();
+      this.history.level = this.level;
+      gameoverCallback.call(this);
+      
+      return this;
+    },
     bonusFinished: function () {
       timeBonus = 0;
     },
@@ -122,30 +127,35 @@ var Marbles = (function (undefined) {
       tagUtil('down');
 
       this.activeTags = true;
-      this.move(x, y, m.tagged, m.type);
+      this.drawMarble(x, y, m.tagged, m.type);
+      return this;
     },
     
-    move: function () {}, // dummy handler
+    drawMarble: function () {}, // dummy handler
     
     newGame: function () {
       this.level = 1;
       score = 0;
       seed = Utils.seed();
+      this.history = { tagged: {1: []}, seed: this.seed(), score: score, level: this.level };
+      return this;
     },
     
     levelUp: function () {
       score = this.getScore();
       this.level++;
+      this.history.tagged[this.level] = [];
+      return this;
     },
     
     init: function (w, h, types) {
       var i, j;
 
-      if (!types) types = 4; // using ! rather then typeof to ensure > 0
-      if (!h && !!(w)) h = w;
-      else if (!h) h = 10;
+      if (!types) types = this.types || 4; // using ! rather then typeof to ensure > 0
+      if (!h && !!(w)) h = this.height || w;
+      else if (!h) h = this.height || 10;
 
-      if (!w) w = 10;
+      if (!w) w = this.width || 10;
 
       this.width = w;
       this.height = h;
@@ -154,6 +164,7 @@ var Marbles = (function (undefined) {
       this.reset();
       marblesLeft = w * h;
       this.align();
+      return this;
     },
 
     reset: function () {
@@ -166,7 +177,7 @@ var Marbles = (function (undefined) {
       marbles = [];
 
       // create a matrix of marbles going left to right, down to up
-      this.loop(function (x, y) {
+      return this.loop(function (x, y) {
         if (!marbles[x]) marbles[x] = [];
         marbles[x].push(new Marble(x, y, ~~(Utils.random()*this.types)+1));
       });
@@ -190,6 +201,7 @@ var Marbles = (function (undefined) {
       
       // check whether the game is still going
       if (!this.movesLeft()) active = false;
+      return this;
     },
     
     score: function () {
@@ -223,12 +235,13 @@ var Marbles = (function (undefined) {
         var m = getMarble(x, y);
         if (m.tagged) {
           m.tagged = false;
-          this.move(x, y, m.tagged, m.type);
+          this.drawMarble(x, y, m.tagged, m.type);
         }                
       });
       
       this.activeTags = false;
       taggedCount = 0;
+      return this;
     },
     
     clear: function (fn) {
@@ -248,7 +261,7 @@ var Marbles = (function (undefined) {
                 if (getMarble(x,i+1)) { // if there's a block above
                   this.swapY(x,i,1,fn);
                 } else if (y == this.height-1) { // top row
-                  this.move(x, y, mb.tagged, mb.type);
+                  this.drawMarble(x, y, mb.tagged, mb.type);
                 }
               }
             }                        
@@ -274,6 +287,12 @@ var Marbles = (function (undefined) {
       
       this.untag();
       this.align();
+      
+      if (this.movesLeft() === 0) {
+        this.gameover();
+      }
+      
+      return this;
     },
     
     marblesLeft: function () {
@@ -301,8 +320,10 @@ var Marbles = (function (undefined) {
       marbles[x1][y1] = new Marble(x1,y1,m2.type,m2.tagged);
       marbles[x2][y1] = new Marble(x2,y1,m1.type,m1.tagged);
       
-      this.move(x1, y1, m2.tagged, m2.type);
-      this.move(x2, y1, m1.tagged, m1.type);
+      this.drawMarble(x1, y1, m2.tagged, m2.type);
+      this.drawMarble(x2, y1, m1.tagged, m1.type);
+      
+      return this;
     },
     
     swapY: function (x1, y1, yInc, fn) {
@@ -313,8 +334,10 @@ var Marbles = (function (undefined) {
       marbles[x1][y1] = new Marble(x1,y1,m2.type,m2.tagged);
       marbles[x1][y2] = new Marble(x1,y2,m1.type,m1.tagged);
 
-      this.move(x1, y1, m2.tagged, m2.type);
-      this.move(x1, y2, m1.tagged, m1.type);
+      this.drawMarble(x1, y1, m2.tagged, m2.type);
+      this.drawMarble(x1, y2, m1.tagged, m1.type);
+      
+      return this;
     },
     
     // ensures we loop in the right direction - bottom left, top right.
@@ -338,6 +361,8 @@ var Marbles = (function (undefined) {
           if (callback) fn.call(this, i);
         }
       }
+      
+      return this;
     },
     
     dump: function () {
@@ -351,13 +376,29 @@ var Marbles = (function (undefined) {
 
       return d;
     },
-    
-    get: function (x,y) {
-      return getMarble(x,y);
+    // serialisation and restoring works, but can't be used, because it would involve
+    // restoring the score, which could lead to cheating (or scores that we couldn't
+    // validate).
+/*/    
+    serialize: function () {
+      var d = '';
+      this.loop(function (x, y) {
+        d += getMarble(x,y).type;
+      });
+
+      return d;      
     },
     
-    mygo: function (bool) {
-      mygo = bool;
+    load: function (state) {
+      return this.loop(function (x, y) {
+        var m = getMarble(x, y);
+        m.type = state.substr(x+(this.width*y), 1);
+        this.move(x, y, m.tagged, m.type);
+      });
+    },
+//*/  
+    get: function (x,y) {
+      return getMarble(x,y);
     }
   };
 })();

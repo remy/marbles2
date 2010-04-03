@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta id="meta" name="viewport" content="width=320; user-scalable=no" />
+<meta id="meta" name="viewport" content="width=device-width; user-scalable=no; initial-scale=1.0; " />
 <meta charset=utf-8 />
 <title>Marbles²</title>
 <link href='marbles-squared.png' rel='apple-touch-icon' />
@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="master.css" type="text/css" />
 </head>
 <body>
-<div id="overlay"></div>
 <div class="toolbar">
   <a href="#" class="buttom" id="start">Start again</a>
 </div>
@@ -54,17 +53,45 @@ var $ = xui,
     $marbles,
     playedBefore = localStorage ? localStorage.getItem('playedBefore') : null;
     
-Marbles.move = function (x, y, tagged, type) {
+Marbles.drawMarble = function (x, y, tagged, type) {
   var i = x + (Marbles.width * y);
   $marbles[x + (Marbles.width * y)].className = colours[type] || 'empty';
   if (tagged) $marbles[i].className += ' selected';
 };
+
+Marbles.gameover(function () {
+  var movesLeft = this.movesLeft();
+  
+  if (movesLeft === 0) {
+    stopTimer();
+  }
+  
+  if (movesLeft === 0 && this.marblesLeft() !== 0) {
+    $('body').addClass('gameover');
+    gameActive = false;
+  } else if (movesLeft === 0 && this.marblesLeft() === 0) {
+    // next level
+    this.levelUp();
+    $('body').addClass('levelup');
+    levelUpTimer = setInterval(function () {
+      var countdown = $('#newGameCountdown')[0];
+      if (countdown.innerHTML == 0) {
+        $('body').removeClass('levelup');
+        countdown.innerHTML = '3';
+        clearInterval(levelUpTimer);
+        initDraw();
+      } else {
+        countdown.innerHTML = countdown.innerHTML - 1;
+      }
+    }, 1000);
+  }
+});
     
-function initDraw(event, noTimer) {
+function initDraw(noTimer) {
   clearInterval(levelUpTimer); // just in case
   $potential.html('Level: ' + Marbles.level);
   Marbles.init(dim.grid[0], dim.grid[1], dim.types);
-  $grid.find('div').each(function () {
+  $grid.find('div').each(function () { // $.fn.remove
     this.parentNode.removeChild(this);
   });
   
@@ -82,7 +109,7 @@ function initDraw(event, noTimer) {
     d.className = colours[m.type]; // should never be tagged during this point
     $grid[0].appendChild(d);
     $(d).css({ 
-      'background': colours[m.tagged ? '-' : m.type], 
+      'background': colours[m.tagged] || 'empty', 
       'left': parseInt(x * dim.marble[0]) + 'px',
       'top': parseInt(h - dim.marble[1] - (y * dim.marble[1])) + 'px'
     });
@@ -91,9 +118,6 @@ function initDraw(event, noTimer) {
   
   gameActive = true;
   $score.html('Score: ' + Marbles.getScore());
-  
-  event && event.preventDefault && event.preventDefault();
-  event && event.stopPropagation && event.stopPropagation();
   
   if (!noTimer) startTimer();
   
@@ -123,16 +147,19 @@ function stopTimer() {
   newTimer(getComputedStyle(document.getElementById('timer'), null).width);
 }
 
-function selectMarble(event) {
+function prevent(event) {
   event && event.preventDefault && event.preventDefault();
-  event && event.stopPropagation && event.stopPropagation();
+  event && event.stopPropagation && event.stopPropagation();  
+}
+
+function selectMarble(event) {
+  prevent(event);
   if (!gameActive) return;
 
   var t = event.target, 
       m = Marbles.get(t.x, t.y);
 
-  if (m) {
-    
+  if (m) { 
     m.tag();
     if (Marbles.activeTags) {
       Marbles.clear();      
@@ -140,33 +167,6 @@ function selectMarble(event) {
   }
 
   $score.html('Score: ' + Marbles.getScore());
-  var movesLeft = Marbles.movesLeft();
-  
-  if (movesLeft === 0) {
-    stopTimer();
-  }
-  
-  if (movesLeft === 0 && Marbles.marblesLeft() !== 0) {
-    $('body').addClass('gameover');
-    gameActive = false;
-    // alert('Game Over\nSeed: ' + Marbles.seed());
-  } else if (movesLeft === 0 && Marbles.marblesLeft() === 0) {
-    // next level
-    Marbles.levelUp();
-    // alert('Congratulations!\nMoving to level ' + Marbles.level);
-    $('body').addClass('levelup');
-    levelUpTimer = setInterval(function () {
-      var countdown = $('#newGameCountdown')[0];
-      if (countdown.innerHTML == 0) {
-        $('body').removeClass('levelup');
-        countdown.innerHTML = '3';
-        clearInterval(levelUpTimer);
-        initDraw();
-      } else {
-        countdown.innerHTML = countdown.innerHTML - 1;
-      }
-    }, 1000);
-  }
 }
 
 // broken in PhoneGap 0.8.3
@@ -194,17 +194,20 @@ document.addEventListener('orientationchange', function(e) {
 
 // play again
 function newGame(event) {
+  prevent(event);
   Marbles.newGame();
-  return initDraw(event);
+  return initDraw();
 }
 
 function retryboard(e) {
+  prevent(event);
   Marbles.seed(Marbles.seed());
   Marbles.newGame();
-  return initDraw(e);
+  return initDraw();
 }
 
-function levelUpNewGame() {
+function levelUpNewGame(event) {
+  prevent(event)
   clearInterval(levelUpTimer);
   $('body').removeClass('levelup');
   $('#newGameCountdown')[0].innerHTML = '3';
@@ -250,8 +253,7 @@ if (!phonegap && /iphone/i.test(navigator.userAgent) && !navigator.standalone &&
   initDraw({}, true);
 }
 
-setTimeout(startTimer, 500);
-
+setTimeout(startTimer, 1000);
 
 // scroll the url bar out of view
 setTimeout(function () {

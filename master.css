@@ -5,7 +5,7 @@ html {
 
 body {
   font-family: "helvetica neue", arial, helvetica;
-  overflow: hidden;
+/*  overflow: hidden;*/
   background:#000 none repeat scroll 0 0;
   color: #fff;
   font-family:Helvetica;
@@ -16,8 +16,8 @@ body {
   height: 100%;
   min-height: 416px;
   margin: 0 auto;
-  padding: 0 3px;
-  width: 314px;
+  padding: 0;
+/*  width: 314px;*/
 /*  width: 320px;*/
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#383838), to(#0A0A0A));
   border-top:1px solid #393939;
@@ -26,11 +26,12 @@ body {
 /* marbles themes */
 #grid { 
   z-index: 10;
-/*  border-top: 1px solid #404040;*/
+  border-top: 1px solid #404040;
+  width: 314px;
   height: 314px;
 /*  height: 320px;*/
   position: relative; 
-  margin: auto;
+  margin: 0 auto;
   -webkit-transition: opacity linear 100ms;
 }
 
@@ -128,7 +129,8 @@ a {
   top: 30%;
   margin: 0 auto;
   text-align: center;
-  width: 314px;
+/*  width: 314px;*/
+  width: 100%;
   -webkit-transform: opacity linear 100ms;
   font-size: 28px;
 }
@@ -218,7 +220,8 @@ a {
   padding: 0;
   background: #7D0000;
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, #f00), color-stop(1, #7D0000));
-  width: 314px;
+/*  width: 314px;*/
+  width: 100%;
   text-shadow: -1px -1px 0px #270000;
   color: rgba(255, 0, 0, 0.2);
 }
@@ -255,3 +258,14 @@ a {
 .saveToSpring #saveToSpring {
   display: block;
 }
+
+/* Portrait */
+/*@media screen and (max-width: 320px) {
+  body { -webkit-transform: rotate(0deg); }
+}
+*/ 
+/* Landscape */
+/*@media screen and (min-width: 321px) {
+  body { -webkit-transform: rotate(90deg); }
+}
+*/
