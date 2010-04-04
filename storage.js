@@ -1,3 +1,30 @@
+if (!window.JSON) JSON = {
+  parse: function (s) {
+    var d;
+    eval('d = ' + s);
+    return d;
+  },
+  stringify: function (o) {
+    var string = '', parts = [], type = o.toString();
+    if (type == '[object Object]') {
+      for (var k in o) {
+        parts.push('"' + k + '"' + ':' + JSON.stringify(o[k]));
+      }
+      string = '{' + parts.join(',') + '}';
+    } else if (o instanceof Array) {
+      for (k = 0; k < o.length; k++) {
+        parts.push(JSON.stringify(o[k]));
+      }
+      string = '[' + parts.join(',') + ']';
+    } else if (typeof o == 'string') {
+      string = '"' + o.replace(/[\n"]/, function (m) { return { '\n' : '\\n', '"' : '\\"'}; }) + '"';
+    } else {
+      string = o.toString();
+    } 
+    return string;
+  }
+};
+
 if (!window.localStorage || !window.sessionStorage) (function () {
 
 var Storage = function (type) {

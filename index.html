@@ -52,34 +52,8 @@
 <script src="marbles.js"></script>
 <script>
 // poor man's JSON parser - we're only using it for private data
-if (window.JSON == undefined) JSON = {
-  parse: function (s) {
-    var d;
-    eval('d = ' + s);
-    return d;
-  },
-  stringify: function (o) {
-    var string = '', parts = [], type = o.toString();
-    if (type == '[object Object]') {
-      for (var k in o) {
-        parts.push('"' + k + '"' + ':' + JSON.stringify(o[k]));
-      }
-      string = '{' + parts.join(',') + '}';
-    } else if (o instanceof Array) {
-      for (k = 0; k < o.length; k++) {
-        parts.push(JSON.stringify(o[k]));
-      }
-      string = '[' + parts.join(',') + ']';
-    } else if (typeof o == 'string') {
-      string = '"' + o.replace(/[\n"]/, function (m) { return { '\n' : '\\n', '"' : '\\"'}; }) + '"';
-    } else {
-      string = o.toString();
-    } 
-    return string;
-  }
-};
-
 (function () {
+  
 var $ = xui, 
     bonusTimer, 
     levelUpTimer = null,
@@ -95,7 +69,7 @@ var $ = xui,
     $retryboard = $('#retryboard'),
     $playagain = $('#playagain'),
     $marbles,
-    highscores = JSON.parse(localStorage.getItem('highscores') || '[]'),
+    highscores = JSON.parse(localStorage.getItem('highscores') || '[]') || [],
     playedBefore = localStorage ? localStorage.getItem('playedBefore') : null,
     lose = [
       'You lose.',
@@ -180,7 +154,7 @@ function initDraw(noTimer) {
   gameActive = true;
   $score.html('Score: ' + commafy(Marbles.getScore()));
   
-  if (!noTimer) startTimer();
+  if (noTimer != true) startTimer();
   
   return false;
 }
@@ -214,7 +188,7 @@ function prevent(event) {
 }
 
 function selectMarble(event) {
-  prevent(event);
+  prevent(event);  
   if (!gameActive) return;
 
   var t = event.target, 
@@ -441,9 +415,8 @@ if (!phonegap && /iphone/i.test(navigator.userAgent) && !navigator.standalone &&
 } else {
   // Run!
   initDraw(true);
+  setTimeout(startTimer, 1000);
 }
-
-setTimeout(startTimer, 1000);
 
 // scroll the url bar out of view
 setTimeout(function () {
