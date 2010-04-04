@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta id="meta" name="viewport" content="width=device-width; user-scalable=no; initial-scale=1.0; " />
+<meta id="meta" name="viewport" content="width=device-width; user-scalable=no; initial-scale=1.0" />
 <meta charset=utf-8 />
 <title>Marbles²</title>
 <link href='marbles-squared.png' rel='apple-touch-icon' />
@@ -52,7 +52,7 @@
 <script src="marbles.js"></script>
 <script>
 // poor man's JSON parser - we're only using it for private data
-if (JSON === undefined) JSON = {
+if (window.JSON == undefined) JSON = {
   parse: function (s) {
     var d;
     eval('d = ' + s);
