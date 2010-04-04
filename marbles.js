@@ -87,6 +87,8 @@ var Marbles = (function (undefined) {
         return this;
       }
       
+      score += this.bonus();
+      
       this.history.score = this.getScore();
       this.history.level = this.level;
       gameoverCallback.call(this);
@@ -209,7 +211,7 @@ var Marbles = (function (undefined) {
     },
     
     getScore: function () {
-      return score + this.bonus();
+      return score;
     },
     
     bonus: function () {
@@ -224,8 +226,6 @@ var Marbles = (function (undefined) {
       } else if (!active && marblesLeft <= 5) {
         bonus = 150;
       }
-      
-      // time based bonus
       
       return bonus;
     },
@@ -245,22 +245,22 @@ var Marbles = (function (undefined) {
     },
     
     clear: function (fn) {
-      var x, y, i, mb;
+      var x, y, i, mb, w = this.width, h = this.height;
       if (this.activeTags) {
         score += this.score();
         // go left to right, down to up clearing columns
-        for (x = 0; x < this.width; x++) {
-          for (y = 0; y < this.height; y++) {
+        for (x = 0; x < w; x++) {
+          for (y = 0; y < w; y++) {
             while (getMarble(x,y).tagged) {
               mb = getMarble(x,y);
               mb.type = empty;
               marblesLeft--;
               mb.tagged = false;
               // go up until we find untagged or end
-              for (i = y; i < this.height; i++) {
+              for (i = y; i < h; i++) {
                 if (getMarble(x,i+1)) { // if there's a block above
                   this.swapY(x,i,1,fn);
-                } else if (y == this.height-1) { // top row
+                } else if (y == h-1) { // top row
                   this.drawMarble(x, y, mb.tagged, mb.type);
                 }
               }
@@ -274,12 +274,12 @@ var Marbles = (function (undefined) {
         mb = getMarble(x, 0);
         if (mb.type === empty) { // implies empty column
           // find the next column with marbles
-          for (i = x + 1; i < this.width; i++) {
+          for (i = x + 1; i < w; i++) {
             if (getMarble(i,0).type !== empty) {
               this.loop('y', function (y) {
                 this.swapX(i, y, x - i, fn);
               });
-              i = this.width; // end loop
+              i = w; // end loop
             }
           }
         }
@@ -348,16 +348,20 @@ var Marbles = (function (undefined) {
         dir = null;
       }
       
-      var x, y, i, callback = !!(typeof fn == 'function');
+      var x, y, i, 
+					callback = !!(typeof fn == 'function'), 
+					h = this.height, 
+					w = this.width, 
+					loop = (dir == 'x' ? w : h);
       
       if (!dir) {
-        for (y = 0; y < this.height; y++) {
-          for (x = 0; x < this.width; x++) {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
             if (callback) fn.call(this, x, y);
           }
         }
       } else {
-        for (i = 0; i < (dir == 'x' ? this.width : this.height); i++) {
+        for (i = 0; i < loop; i++) {
           if (callback) fn.call(this, i);
         }
       }

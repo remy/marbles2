@@ -1,3 +1,10 @@
+* {
+  -webkit-touch-callout: none; /* prevent callout to copy image, etc when tap to hold */
+  -webkit-text-size-adjust: none; /* prevent webkit from resizing text to fit */
+  -webkit-tap-highlight-color: rgba(0,0,0,1.0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+  -webkit-user-select: none; /* prevent copy paste, to allow, change 'none' to 'text' */
+}
+
 html {
   height: 100%;
   min-height: 420px;
@@ -5,7 +12,7 @@ html {
 
 body {
   font-family: "helvetica neue", arial, helvetica;
-/*  overflow: hidden;*/
+  overflow: hidden;
   background:#000 none repeat scroll 0 0;
   color: #fff;
   font-family:Helvetica;
@@ -25,6 +32,8 @@ body {
 
 /* marbles themes */
 #grid { 
+/*  border-left: 3px solid #000;
+  border-right: 3px solid #000;*/
   z-index: 10;
   border-top: 1px solid #404040;
   width: 314px;
@@ -112,13 +121,15 @@ a {
   bottom: 0;
 }
 
+#highscore,
 #start,
 #potential {
   float: right;
   text-decoration: none;
 }
 
-#score {
+#score,
+#highscore {
   float: left;
 }
 
@@ -269,3 +280,105 @@ a {
   body { -webkit-transform: rotate(90deg); }
 }
 */
+
+#highscores {
+/*  display: none;*/
+  opacity: 0;
+  background: #000;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  -webkit-transition: all 200ms ease-out;
+}
+
+#highscores > div {
+  background: #fff;
+  color: #000;
+  height: 100%;  
+  margin: 0 10px;
+}
+
+#highscores h1 {
+  border: 10px solid #fff;
+  line-height: 48px;
+  font-size: 28px;
+  margin: 10px;
+  font-family: georgia;
+  font-style: italic;
+  margin-bottom: 0;
+  -webkit-border-top-right-radius: 20px;
+  -webkit-border-top-left-radius: 20px;
+  -moz-border-radius-topright: 20px;
+  -moz-border-radius-topleft: 20px;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  border-bottom: 0;
+  text-align: center;
+  background: #1B8500;
+  text-shadow: 1px 1px 0px #093F00;
+  color: #fff;
+}
+
+#highscores table {
+  border-collapse: collapse; 
+  width: 100%;
+  border: 10px solid #fff;
+  border-top: 0;
+}
+
+#highscores .position {
+  width: 10%;
+}
+
+#highscores .score {
+  width: 30%;
+}
+
+#highscores .when {
+  width: 70%;
+}
+
+#highscores td, #highscores th {
+  padding: 5px 10px;
+}
+
+#highscores td, #highscores th {
+  font-size: 18px;
+  text-align: left;
+  font-family: georgia;
+}
+
+#highscores tbody tr:nth-child(even) {
+  background: #E4F6D8;
+}
+
+#highscores thead {
+	display: none;
+}
+
+#highscores tbody td {
+	text-align: right;
+}
+
+#highscores tbody td:nth-child(3) {
+  text-align: left;
+}
+
+.highscores #highscores {
+/*  display: block;*/
+  opacity: 1;
+  top: 0;
+}
+
+/*.toolbar a {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+.toolbar a:focus,
+.toolbar a:active,
+.toolbar a:hover {
+  -webkit-background-composite: plus-lighter;
+}*/
