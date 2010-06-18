@@ -1,8 +1,13 @@
 * {
   -webkit-touch-callout: none; /* prevent callout to copy image, etc when tap to hold */
   -webkit-text-size-adjust: none; /* prevent webkit from resizing text to fit */
-  -webkit-tap-highlight-color: rgba(0,0,0,1.0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+/* make transparent link selection, adjust last value opacity 0 to 1.0 */
+  -webkit-tap-highlight-color: rgba(0,0,0,1.0); 
   -webkit-user-select: none; /* prevent copy paste, to allow, change 'none' to 'text' */
+}
+
+#grid {
+  -webkit-tap-highlight-color: rgba(0,0,0,0); 
 }
 
 html {
@@ -100,6 +105,7 @@ a {
   cursor: auto;
 }
 
+#grid > .active,
 #grid > .selected {
   opacity: 0.5;
 }
@@ -112,7 +118,7 @@ a {
   font-size: 24px;
   line-height: 44px;
   font-weight: bold;
-  padding: 4px;
+/*  padding: 4px;*/
   border-bottom: 1px solid #242424;
 }
 
@@ -122,7 +128,7 @@ a {
 }
 
 #highscore,
-#start,
+/*#start,*/
 #potential {
   float: right;
   text-decoration: none;
@@ -137,7 +143,7 @@ a {
   z-index: 10;
   display: none;
   position: absolute;
-  top: 30%;
+  top: 25%;
   margin: 0 auto;
   text-align: center;
 /*  width: 314px;*/
@@ -148,9 +154,14 @@ a {
 
 #levelup {
   cursor: pointer;
-  top: 40%;
-  border: 1px solid #0c0;
-  background: rgba(0,218,0,.4);
+  top: 30%;
+  border: 1px inset #505050;
+/*  border-style: none/hidden/dotted/dashed/solid/double/groove/ridge/inset/outset;*/
+  background: #171717;
+  -webkit-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
+  -moz-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
+  -o-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
+  box-shadow: 0 0 5px rgba(255, 255, 255, .05);
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
@@ -158,6 +169,7 @@ a {
   font-size: 18px;
   margin: 0 10%;
   width: 80%;
+  padding: 20px 0;
 /*  background: #00c -webkit-gradient(linear, 0% 0%, 0% 75%, from(rgba(0,0,218,.4)), to(rgba(0,0,99,0.4)));*/
 }
 
@@ -170,7 +182,7 @@ a {
 #newGameCountdown {
   position: absolute;
   margin-top: -5px;
-  font-family: georgia;
+/*  font-family: georgia;*/
   margin-left: 5px;
   font-size: 28px;
 }
@@ -195,15 +207,19 @@ a {
 
 #replay a {
   text-decoration: none;
-  padding: 10px 15px;
+  padding: 10px 40px;
   font-size: 20px;
   border: 3px solid #fff;
   -webkit-box-shadow: 0 0 4px rgba(255,255,255,0.8);
   -moz-box-shadow: 0 0 4px rgba(255,255,255,0.8);
   box-shadow: 0 0 4px rgba(255,255,255,0.8);
   text-shadow: 0 0 4px rgba(255,255,255,0.3);
-  background: #00c;
+/*  background: #00c;
   background: #00c -webkit-gradient(linear, 0% 0%, 0% 50%, from(#0000ff), to(#000063));
+*/
+  background: #242424;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, rgba(0,0,0,0)), color-stop(0.5, rgba(255,255,255,.15)), color-stop(0.51, rgba(0,0,0,0)), color-stop(1, rgba(0,0,0,0)));
+
   border-radius: 24px;
   -moz-border-radius: 24px;
   -webkit-border-radius: 24px;
@@ -245,6 +261,10 @@ a {
 
 #status {
   border: 0;
+}
+
+#status span {
+  margin: 0 7px;
 }
 
 /*
@@ -372,3 +392,103 @@ a {
   opacity: 1;
   top: 0;
 }
+
+#toolbar {
+  background: rgba(0, 0, 0, .1);
+}
+
+#toolbar a {
+/*  background: #242424;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, rgba(0,0,0,0)), color-stop(0.5, rgba(255,255,255,.15)), color-stop(0.51, rgba(0,0,0,0)), color-stop(1, rgba(0,0,0,0)));
+  padding: 0 20px;
+  border: 2px solid #fff;
+  height: 40px;
+  -webkit-box-shadow: 0px 0px 2px #fff;
+  -moz-box-shadow: -5px 0px 10px #1A1A1A, 5px 0px 10px #1A1A1A;
+  -o-box-shadow: -5px 0px 10px #1A1A1A, 5px 0px 10px #1A1A1A;
+  box-shadow: -5px 0px 10px #1A1A1A, 5px 0px 10px #1A1A1A;
+*/}
+
+#start {
+  position: absolute;
+  right: 5px;
+  top: 7px;
+}
+
+#highscore {
+  left: 5px;
+  top: 7px;
+  position: absolute;
+}
+
+.button {
+  border-width: 0 5px;
+  padding: 8px 5px 0 5px;
+  display: block;
+  height: 22px;
+  line-height: 16px;
+  max-width: 496px;
+  -webkit-user-select: none;
+  -webkit-border-image: url(images/button.png) 0 5 0 5 stretch stretch;
+  -webkit-tap-highlight-color: rgba(0,0,0,0); 
+  color: #fff;
+  font-family: 'Helvetica Neue', Helvetica;
+  font-size: 12px;
+  font-weight: bold;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-shadow: rgba(0, 0, 0, 0.597656) 0px -1px 0px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.button.active {
+  -webkit-border-image: url(images/buttonPressed.png) 0 5 0 5 stretch stretch;  
+}
+
+.button img {
+  vertical-align: top;
+}
+
+#hsn {
+  margin-left: 5px;
+}
+
+#hsn:empty {
+  margin-left: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

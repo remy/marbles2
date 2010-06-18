@@ -11,9 +11,9 @@
 <link rel="stylesheet" href="master.css" type="text/css" />
 </head>
 <body>
-<div class="toolbar">
-  <a href="#" id="highscore">Best: <span id="hsn">0</span></a>
-  <a href="#" id="start">New Board</a>
+<div class="toolbar" id="toolbar">
+  <div class="button" id="highscore"><img src="images/highscore.png" /><span id="hsn"></span></div>
+  <div class="button" id="start">New Game</div>
 </div>
 <div selected="true" id="grid"></div>
 <div id="levelup">
@@ -47,12 +47,13 @@
 </div>
 <script src="xui-core-1.0.0.min.js"></script>
 <script src="xui-anim.js"></script>
+<script src="xui-plugins.js"></script>
 <script src="phonegap.js"></script>
 <script src="storage.js"></script>
 <script src="marbles.js"></script>
 <script>
 // poor man's JSON parser - we're only using it for private data
-(function () {
+// (function () {
   
 var $ = xui, 
     bonusTimer, 
@@ -63,7 +64,10 @@ var $ = xui,
     $grid = $('#grid'),
     n = 7, 
     // dimension information - 7x7 grid, 3 types
-    dim = { grid: [n,n], types: 3, marble: [~~(320/n),~~(320/n)] },
+    controlHeight = 44 * 3,
+    // baseWidth = (window.outerWidth > window.outerHeight ? window.outerHeight : window.outerHeightWidth) - controlHeight,
+    baseWidth = 320,
+    dim = { grid: [n,n], types: 3, marble: [~~(baseWidth/n),~~(baseWidth/n)] },
     $score = $('#score'),
     $start = $('#start'),
     $retryboard = $('#retryboard'),
@@ -82,6 +86,10 @@ var $ = xui,
       'Shall we start again?'
     ],
     $body = $(document.body);
+
+// var s = document.createElement('style');
+// s.innerText = '#grid > div { height: ' + ((baseWidth/7)-2) + 'px; width: ' + ((baseWidth/2)-2) + 'px; }';
+// document.body.appendChild(s);
 
 Marbles.drawMarble = function (x, y, tagged, type) {
   var i = x + (Marbles.width * y);
@@ -152,6 +160,7 @@ function initDraw(noTimer) {
     });
   });
   $marbles = $grid.find('div'); //$($grid[0].getElementsByTagName('div'));
+  $marbles.touch(selectMarble);
   gameActive = true;
   $score.html('Score: ' + commafy(Marbles.getScore()));
   
@@ -189,10 +198,11 @@ function prevent(event) {
 }
 
 function selectMarble(event) {
-  prevent(event);  
+  prevent(event);
+  
   if (!gameActive) return;
 
-  var t = event.target, 
+  var t = this, //event.target, 
       m = Marbles.get(t.x, t.y);
 
   if (m) { 
@@ -379,20 +389,16 @@ var time = function () {
   };
 }();
 
-$.fn.touchClick = function (fn) {
-  return this.on('touchstart', fn).on('click', fn);
-};
-
 $('#hsn').html(highscores.length ? commafy(highscores[0].score) : '0');
 
 // event hook up
-$start.touchClick(newGame);
+$start.touch(newGame);
 // $playagain.touchClick(newGame);
 $retryboard.touchClick(retryboard);
-$grid.touchClick(selectMarble);
+// $grid.touchClick(selectMarble);
 
 $('#levelup').touchClick(levelUpNewGame);
-$('#highscore').touchClick(showHighscores);
+$('#highscore').touch(showHighscores);
 
 $('#highscores').touchClick(function (event) {
   prevent(event);
@@ -411,7 +417,7 @@ if (!phonegap && /iphone/i.test(navigator.userAgent) && !navigator.standalone &&
     localStorage.setItem('playedBefore', true);    
   } catch (e) {}
   document.body.className = 'saveToSpring';
-  $(document).on('touchstart', removeSave).on('click', removeSave);
+  $(document).touchClick(removeSave);
   initDraw(true);
 } else {
   // Run!
@@ -423,7 +429,16 @@ if (!phonegap && /iphone/i.test(navigator.userAgent) && !navigator.standalone &&
 setTimeout(function () {
   window.scrollTo(0, 1);
 }, 10);
-})();
+
+// ui hook ups
+// $('.button').button();
+$('body').on('touchmove', function (e) {
+  e.preventDefault();
+});
+
+// showHighscores();
+
+// })();
 </script>
 </body>
 </html>
