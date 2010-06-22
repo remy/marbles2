@@ -275,7 +275,7 @@ function removeSave(event) {
 
 function saveHighscore() {
   var score = Marbles.getScore(), oldhighscore = highscores.length ? highscores[0].score : 0;
-  highscores.push({ score: score, date: +new Date(), level: Marbles.level });
+  highscores.push({ score: score, date: +new Date(), level: Marbles.level, seed: Marbles.seed() });
   highscores = highscores.sort(function (a, b) {
     return b.score > a.score ? 1 : -1;
   }).slice(0, 10); // limit to 10;
@@ -306,7 +306,7 @@ function showHighscores(event) {
   var el = $('#highscoreTable')[0];
   el.innerHTML = '';
   highscores.forEach(function (score, i) {
-    el.innerHTML += '<tr><td>' + (i+1) + '</td><td>' + commafy(score.score) + '</td><td>' + time.relative(score.date) +'</td></tr>';
+    el.innerHTML += '<tr><td>' + time.relative(score.date) +'</td><td>' + commafy(score.score) + '</td><td>' + (score.seed ? '<div class="playagain button" data-seed="' + score.seed + '">Play</div>' : '&nbsp;') + '</td></tr>';
   });
   
   $body.addClass('highscores');
@@ -348,22 +348,22 @@ var time = function () {
     time: function (date) {
       var hour = date.getHours(),
           min = date.getMinutes() + "",
-          ampm = 'AM';
+          ampm = 'am';
   
       if (hour == 0) {
         hour = 12;
       } else if (hour == 12) {
-        ampm = 'PM';
+        ampm = 'pm';
       } else if (hour > 12) {
         hour -= 12;
-        ampm = 'PM';
+        ampm = 'pm';
       }
   
       if (min.length == 1) {
         min = '0' + min;
       }
   
-      return hour + ':' + min + ' ' + ampm;
+      return hour + ampm;
     },
     date: function (date) {
       var ds = date.toDateString().split(/ /),
@@ -407,9 +407,9 @@ var time = function () {
       } else if (delta < 120) {
         r = 'a minute ago';
       } else if (delta < (45*60)) {
-        r = (~~(delta / 60)).toString() + ' minutes ago';
+        r = (~~(delta / 60)).toString() + ' mins ago';
       } else if (delta < (2*90*60)) { // 2* because sometimes read 1 hours ago
-        r = (~~(delta / 60)).toString() + ' minutes ago';
+        r = (~~(delta / 60)).toString() + ' mins ago';
         // r = '1 hour ago';
       } else if (delta < (24*60*60)) {
         r = (~~(delta / 3600)).toString() + ' hours ago';
@@ -417,7 +417,7 @@ var time = function () {
         if (delta < (48*60*60)) {
           r = this.time(date) + ' yesterday';
         } else {
-          r = this.time(date) + ' ' + this.date(date);
+          r = this.date(date); //  this.time(date) + ' ' + 
         }
       }
 
@@ -484,6 +484,7 @@ if (!nativeapp && /iphone/i.test(navigator.userAgent) && !navigator.standalone &
 
 $(document).on('deviceready', function () {
   document.body.className = '';
+  showHighscores();
   setTimeout(startTimer, 1000);
 });
 
