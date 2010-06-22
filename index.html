@@ -25,7 +25,7 @@
 <div id="replay">
   <p id="msg">You lose!</p>
   <a id="retryboard" href="#">Retry board</a>
-  <!-- <a id="tweet" href="#">Tweet!</a> -->
+  <a id="tweet" href="#">Tweet!</a>
 </div>
 <div id="status" class="toolbar">
   <span id="score">Score: 0</span>
@@ -114,7 +114,7 @@ Marbles.gameover(function () {
     msg = saveHighscore();
     $('#msg').html(msg);
     $body.addClass('gameover');
-    
+    serverLog(JSON.stringify(Marbles.history));
   } else if (movesLeft === 0 && this.marblesLeft() === 0) {
     // next level
     this.levelUp();
@@ -335,6 +335,13 @@ function openURL(url, def) {
   }
 }
 
+function serverLog(message) {
+  var client = new XMLHttpRequest();
+  client.open("POST", "http://marbles2.com/log.php");
+  client.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  client.send('data='+encodeURIComponent(message));
+}
+
 var time = function () {
   var monthDict = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return {
@@ -425,7 +432,7 @@ $('#hsn').html(highscores.length ? commafy(highscores[0].score) : '');
 $start.touch(newGame);
 $tweet.touch(function () {
   var msg = "I just scored " + commafy(highscores[0].score) + " using this board: http://marbles2.com/app/?seed=" + Marbles.seed();
-  openURL('tweetie:///post?message=' + escape(msg), 'http://twitter.com/?status=' + escape(msg));
+  openURL('tweetie:///post?message=' + encodeURIComponent(msg), 'http://twitter.com/?status=' + encodeURIComponent(msg));
 });
 
 // $playagain.touchClick(newGame);
@@ -451,10 +458,11 @@ window.location.search.replace(/\bseed=([^&=]*)\b/, function (m, seed) {
   var iframe = document.createElement('iframe');
   iframe.style.visibility = 'none';
   document.body.appendChild(iframe);
+  var doc = doc.contentDocument || doc.contentWindow.document;
   iframe.onload = function () {
     document.body.removeChild(iframe);
   };
-  iframe.contentWindow.location = 'marbles:///seed=' + seed;
+  doc.location = 'marbles:///?seed=' + seed;
   Marbles.seed(seed); // handle the web based game using the seed
 });
 
@@ -469,6 +477,7 @@ if (!nativeapp && /iphone/i.test(navigator.userAgent) && !navigator.standalone &
 } else {
   // Run!
   if (window.Invoke_params) {
+    alert('using seed: ' + JSON.stringify(window.Invoke_params));
     Marbles.seed(window.Invoke_params.seed);
   }
   initDraw(true);
