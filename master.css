@@ -10,7 +10,7 @@
   -webkit-tap-highlight-color: rgba(0,0,0,0); 
 }
 
-html {
+html, body {
   height: 100%;
   min-height: 420px;
 }
@@ -24,9 +24,8 @@ body {
   font-size:72%;
   line-height:1.5em;
   position: relative;
-  max-height: 460px;
-  height: 100%;
-  min-height: 416px;
+/*  max-height: 460px;*/
+/*  min-height: 416px;*/
   margin: 0 auto;
   padding: 0;
 /*  width: 314px;*/
@@ -41,8 +40,8 @@ body {
   border-right: 3px solid #000;*/
   z-index: 10;
   border-top: 1px solid #404040;
-  width: 314px;
-  height: 314px;
+/*  width: 314px;*/
+/*  height: 314px;*/
 /*  height: 320px;*/
   position: relative; 
   margin: 0 auto;
@@ -85,7 +84,7 @@ a {
 
 #grid > .two {
   background: #43BDF7;
-  background: -webkit-gradient(radial, 50% 0%, 0, 0% 0%, 50, color-stop(0, #43BDF7), color-stop(1, #4398F7));
+  background: -webkit-gradient(radial, 50% 0%, 0, 25% 0%, 50, color-stop(0, #43BDF7), color-stop(1, #4398F7));
   border: 2px solid #43BDF7;
 }
 
@@ -239,7 +238,7 @@ a {
 
 #timer {
   overflow: hidden;
-  z-index: 9; /* sits below everything */
+  z-index: 9; /* 9 - sits below everything */
   position: absolute;
   bottom: 2px;
   height: 44px;
@@ -260,6 +259,8 @@ a {
 }
 
 #status {
+/*  position: absolute;*/
+/*  bottom: 0;*/
   border: 0;
 }
 
@@ -458,6 +459,24 @@ a {
 #hsn:empty {
   margin-left: 0;
 }
+
+#loading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: #000 url(Default.png) no-repeat bottom;
+  z-index: 99;
+  display: none;
+}
+
+.loading #loading {
+  display: block;
+}
+
 
 
 
