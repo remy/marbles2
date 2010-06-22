@@ -5,7 +5,7 @@
 <meta charset=utf-8 />
 <title>Marbles²</title>
 <link href='marbles-squared.png' rel='apple-touch-icon' />
-<link href="marbles-squared.png" rel="icon" type="image/png" />
+<link href='marbles-squared.png' rel='icon' type="image/png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link href='Default.png' rel='apple-touch-startup-image' />
@@ -25,7 +25,7 @@
 <div id="replay">
   <p id="msg">You lose!</p>
   <a id="retryboard" href="#">Retry board</a>
-  <!-- <a id="playagain" href="#">New Board</a> -->
+  <!-- <a id="tweet" href="#">Tweet!</a> -->
 </div>
 <div id="status" class="toolbar">
   <span id="score">Score: 0</span>
@@ -65,9 +65,9 @@ var $ = xui,
     $grid = $('#grid'),
     n = 7, 
     // dimension information - 7x7 grid, 3 types
-    appview = (window.innerHeight == 460 && !navigator.standalone) ? 1 : false, // this sucks, but it's the only way to work it out
+    nativeapp = (window.innerHeight == 460 && !navigator.standalone) ? 1 : false, // this sucks, but it's the only way to work it out
     comp = window.getComputedStyle(document.body,null),
-    bodyDims = { height: parseInt(comp['height']) - (appview ? 20 : 0), width: parseInt(comp['width']) },
+    bodyDims = { height: parseInt(comp['height']) - (nativeapp ? 20 : 0), width: parseInt(comp['width']) },
     whichBaseLine = bodyDims.width > bodyDims.height ? 'height' : 'width',
     controlHeight = bodyDims.height - bodyDims.width < 90 ? 90 : 0, // 90 = 44 * 2 + 2px border 
     baseWidth = (bodyDims.width > bodyDims.height ? bodyDims.height : bodyDims.width) - controlHeight,
@@ -90,7 +90,8 @@ var $ = xui,
       'Are you even trying?',
       'Shall we start again?'
     ],
-    $body = $(document.body);
+    $body = $(document.body),
+    $tweet = $('#tweet');
 
 
 var s = document.createElement('style');
@@ -311,6 +312,29 @@ function showHighscores(event) {
   $body.addClass('highscores');
 }
 
+function openURL(url, def) {
+  var iframe = document.createElement('iframe');
+  iframe.style.visibility = 'none';
+  iframe.style.position = 'absolute';
+  iframe.style.left = '-999px';
+  iframe.style.height = '1px';
+  iframe.style.width = '1px';
+  
+  document.body.appendChild(iframe);
+  
+  if (!nativeapp) {
+    window.location = def;
+    return;
+  }
+  
+  var sandbox = iframe.contentWindow;
+  try {
+    var ok = iframe.contentWindow.eval('location = "' + url + '";');
+  } catch (e) {
+    window.location = def;
+  }
+}
+
 var time = function () {
   var monthDict = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return {
@@ -399,6 +423,11 @@ $('#hsn').html(highscores.length ? commafy(highscores[0].score) : '');
 
 // event hook up
 $start.touch(newGame);
+$tweet.touch(function () {
+  var msg = "I just scored " + commafy(highscores[0].score) + " using this board: http://marbles2.com/app/?seed=" + Marbles.seed();
+  openURL('tweetie:///post?message=' + escape(msg), 'http://twitter.com/?status=' + escape(msg));
+});
+
 // $playagain.touchClick(newGame);
 $retryboard.touchClick(retryboard);
 // $grid.touchClick(selectMarble);
@@ -422,16 +451,15 @@ window.location.search.replace(/\bseed=([^&=]*)\b/, function (m, seed) {
   var iframe = document.createElement('iframe');
   iframe.style.visibility = 'none';
   document.body.appendChild(iframe);
-  var doc = doc.contentDocument || doc.contentWindow.document;
   iframe.onload = function () {
     document.body.removeChild(iframe);
   };
-  doc.location = 'marbles:///seed=' + seed;
+  iframe.contentWindow.location = 'marbles:///seed=' + seed;
   Marbles.seed(seed); // handle the web based game using the seed
 });
 
 // horrible, but adds a tiny bit of nice ux
-if (!appview && /iphone/i.test(navigator.userAgent) && !navigator.standalone && !playedBefore ) {
+if (!nativeapp && /iphone/i.test(navigator.userAgent) && !navigator.standalone && !playedBefore ) {
   try {
     localStorage.setItem('playedBefore', true);    
   } catch (e) {}
@@ -440,11 +468,13 @@ if (!appview && /iphone/i.test(navigator.userAgent) && !navigator.standalone && 
   initDraw(true);
 } else {
   // Run!
+  if (window.Invoke_params) {
+    Marbles.seed(window.Invoke_params.seed);
+  }
   initDraw(true);
 }
 
 $(document).on('deviceready', function () {
-  // alert(window.Invoke_params);
   document.body.className = '';
   setTimeout(startTimer, 1000);
 });
