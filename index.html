@@ -78,6 +78,8 @@ var $ = xui,
     $retryboard = $('#retryboard'),
     // $playagain = $('#playagain'),
     $marbles,
+    $highscoreTable = $('#highscoreTable'),
+    highscoreTable = $highscoreTable[0],
     highscores = JSON.parse(localStorage.getItem('highscores') || '[]') || [],
     playedBefore = localStorage ? localStorage.getItem('playedBefore') : null,
     lose = [
@@ -248,6 +250,7 @@ $(document).on('orientationchange', function(e) {
 // play again
 function newGame(event) {
   prevent(event);
+  Marbles.seed(true);
   Marbles.newGame();
   return initDraw();
 }
@@ -303,23 +306,27 @@ function commafy(n) {
 
 function showHighscores(event) {
   prevent(event);
-  var el = $('#highscoreTable')[0];
+  var el = highscoreTable;
   el.innerHTML = '';
   highscores.forEach(function (score, i) {
-    el.innerHTML += '<tr><td>' + time.relative(score.date) +'</td><td>' + commafy(score.score) + '</td><td>' + (score.seed ? '<div class="playagain button" data-seed="' + score.seed + '">Play</div>' : '&nbsp;') + '</td></tr>';
+    el.innerHTML += '<tr><td>' + time.relative(score.date) +'</td><td>' + commafy(score.score) + '</td><td>' + (score.seed ? '<div class="playagain button" data-seed="' + score.seed + '" title="' + score.seed + '">Play</div>' : '&nbsp;') + '</td></tr>';
   });
   
   $body.addClass('highscores');
 }
 
-function openURL(url, def) {
+function getIFrame() {
   var iframe = document.createElement('iframe');
   iframe.style.visibility = 'none';
   iframe.style.position = 'absolute';
   iframe.style.left = '-999px';
   iframe.style.height = '1px';
   iframe.style.width = '1px';
-  
+  return iframe;
+}
+
+function openURL(url, def) {
+  var iframe = getIFrame();
   document.body.appendChild(iframe);
   
   if (!nativeapp) {
@@ -455,8 +462,7 @@ $body.on('touchmove', prevent);
 // if it's not, it won't redirect, and the user will stil be able to play
 // the game
 window.location.search.replace(/\bseed=([^&=]*)\b/, function (m, seed) {
-  var iframe = document.createElement('iframe');
-  iframe.style.visibility = 'none';
+  var iframe = getIFrame();
   document.body.appendChild(iframe);
   iframe.onload = function () {
     document.body.removeChild(iframe);
@@ -482,9 +488,20 @@ if (!nativeapp && /iphone/i.test(navigator.userAgent) && !navigator.standalone &
   initDraw(true);
 }
 
+// event delegate the play button clicking
+$highscoreTable.on('click', function (event) {
+  console.log('ok', event.target);
+  var seed = event.target.getAttribute('data-seed');
+  if (event.target.className.match(/playagain/i) && seed) {
+    console.log(event.target, seed);
+    Marbles.seed(seed);
+    initDraw();
+  }
+});
+
 $(document).on('deviceready', function () {
   document.body.className = '';
-  showHighscores();
+  // showHighscores();
   setTimeout(startTimer, 1000);
 });
 

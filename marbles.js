@@ -51,7 +51,7 @@ var Marbles = (function (undefined) {
       random: random,
       seed: function (seed) {
         if (seed === true) {
-          RandSeed = ~~(+new Date / 1000);
+          RandSeed = ~~(+new Date / 1000 * this.random());
         } else if (seed !== undefined) {
           RandSeed = seed;
         }
@@ -99,7 +99,10 @@ var Marbles = (function (undefined) {
       timeBonus = 0;
     },
     seed: function (n) {
-      if (n !== undefined) {
+      if (n === true) {
+        Utils.seed(true);
+        seed = Utils.seed();
+      } else if (n !== undefined) {
         Utils.seed(parseInt(n, 16)); 
         seed = n;
       } 
