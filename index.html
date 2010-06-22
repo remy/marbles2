@@ -458,11 +458,10 @@ window.location.search.replace(/\bseed=([^&=]*)\b/, function (m, seed) {
   var iframe = document.createElement('iframe');
   iframe.style.visibility = 'none';
   document.body.appendChild(iframe);
-  var doc = doc.contentDocument || doc.contentWindow.document;
   iframe.onload = function () {
     document.body.removeChild(iframe);
   };
-  doc.location = 'marbles:///?seed=' + seed;
+  iframe.contentWindow.location = 'marbles:///?seed=' + seed;
   Marbles.seed(seed); // handle the web based game using the seed
 });
 
