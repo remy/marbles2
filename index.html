@@ -118,13 +118,12 @@ Marbles.gameover(function () {
     serverLog(JSON.stringify(Marbles.history));
   } else if (movesLeft === 0 && this.marblesLeft() === 0) {
     // next level
-    this.levelUp();
     $body.addClass('levelup');
     levelUpTimer = setInterval(function () {
       var countdown = $('#newGameCountdown')[0];
       if (countdown.innerHTML == 1) {
         clearInterval(levelUpTimer);
-        initDraw();
+        levelUpNewGame();
       } else {
         countdown.innerHTML = countdown.innerHTML - 1;
       }
@@ -262,6 +261,7 @@ function retryboard(e) {
 }
 
 function levelUpNewGame(event) {
+  Marbles.levelUp();
   prevent(event)
   clearInterval(levelUpTimer);
   $body.removeClass('levelup');

@@ -71,6 +71,16 @@ var Marbles = (function (undefined) {
       end: 0
     };
   }
+  
+  function gameover() {
+    score += this.bonus();
+    this.history.score = this.getScore();
+    this.history.level = this.level;
+    this.history.tagged[this.level].end = +new Date;
+    
+    // global
+    gameoverCallback && gameoverCallback.call(this);
+  }
 
   var marbles = [],
       empty = ' ',
@@ -94,15 +104,6 @@ var Marbles = (function (undefined) {
         gameoverCallback = fn;
         return this;
       }
-      
-      score += this.bonus();
-      
-      this.history.score = this.getScore();
-      this.history.level = this.level;
-      this.history.tagged[this.level].end = +new Date;
-      gameoverCallback && gameoverCallback.call(this);
-      
-      return this;
     },
     bonusFinished: function () {
       timeBonus = 0;
@@ -176,6 +177,7 @@ var Marbles = (function (undefined) {
       this.types = types;
       
       this.reset();
+      this.history.seed = this.seed();
       marblesLeft = w * h;
       this.align();
       return this;
@@ -301,7 +303,7 @@ var Marbles = (function (undefined) {
       this.align();
       
       if (this.movesLeft() === 0) {
-        this.gameover();
+        gameover.call(this);
       }
       
       return this;
