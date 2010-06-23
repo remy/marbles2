@@ -318,7 +318,7 @@ function commafy(n) {
 function showHighscores(event) {
   prevent(event);
   var el = highscoreTable;
-  el.innerHTML = '';
+  if (highscores.length) el.innerHTML = '';
   highscores.forEach(function (score, i) {
     el.innerHTML += '<tr><td>' + commafy(score.score) + '</td><td>' + time.relative(score.date) +'</td><td>' + (score.seed ? '<div class="playagain button" data-seed="' + score.seed + '" title="' + score.seed + '">Play</div>' : '&nbsp;') + '</td></tr>';
   });
