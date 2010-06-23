@@ -324,14 +324,21 @@ a {
 #highscores {
 /*  display: none;*/
   opacity: 0;
-  background: #000;
-  height: 100%;
+  background: #242424;
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#383838), to(#0A0A0A));
+
+  height: 0;
   width: 100%;
   position: absolute;
-  top: 100%;
+  bottom: 0;
   left: 0;
   z-index: 20;
-  -webkit-transition: all 200ms ease-out;
+  -webkit-transition: all 100ms ease-out;
+}
+
+.highscores #highscores {
+  opacity: 1;
+  height: 100%;
 }
 
 #highscores > div {
@@ -346,8 +353,8 @@ a {
   line-height: 48px;
   font-size: 28px;
   margin: 10px;
-  font-family: georgia;
-  font-style: italic;
+/*  font-family: georgia;*/
+/*  font-style: italic;*/
   margin-bottom: 0;
   -webkit-border-top-right-radius: 20px;
   -webkit-border-top-left-radius: 20px;
@@ -357,8 +364,11 @@ a {
   border-top-left-radius: 20px;
   border-bottom: 0;
   text-align: center;
-  background: #1B8500;
-  text-shadow: 1px 1px 0px #093F00;
+/*  background: #1B8500;*/
+  background: #242424;
+  background: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#383838), to(#0A0A0A));
+  
+  text-shadow: 1px 1px 0px #000;
   color: #fff;
 }
 
@@ -388,11 +398,12 @@ a {
 #highscores td, #highscores th {
   font-size: 18px;
   text-align: left;
-  font-family: georgia;
+/*  font-family: georgia;*/
 }
 
 #highscores tbody tr:nth-child(even) {
-  background: #E4F6D8;
+/*  background: #E4F6D8;*/
+  background: #efefef;
 }
 
 #highscores thead {
@@ -405,12 +416,6 @@ a {
 
 #highscores tbody td:nth-child(3) {
   text-align: left;
-}
-
-.highscores #highscores {
-/*  display: block;*/
-  opacity: 1;
-  top: 0;
 }
 
 #toolbar {

@@ -44,7 +44,16 @@
           <th class="when">when</th>
         </tr>
       </thead>
-      <tbody id="highscoreTable"></tbody></table>
+      <tbody id="highscoreTable">
+        <tr>
+          <td colspan="3" style="text-align: left; padding: 0 20px; font-size: 20px; line-height: 20px;">
+            <p>Welcome Marbles<sup>2</sup> player! You've hit the highscores leader board early I'm afraid.</p>
+            <p>There's yet to be any scores saved yet. Have a play, and you'll soon fill up this leaderboard.</p>
+            <p>You can also share your scores through twitter using a game "seed", but don't worry about that, go have a play and enjoy!</p>
+            <p>&mdash; @rem</p>
+          </td>
+        </tr>
+      </tbody></table>
   </div>
 </div>
 <script src="xui-core-1.0.0.min.js"></script>
@@ -115,7 +124,6 @@ Marbles.gameover(function () {
     msg = saveHighscore();
     $('#msg').html(msg);
     $body.addClass('gameover');
-    serverLog(JSON.stringify(Marbles.history));
   } else if (movesLeft === 0 && this.marblesLeft() === 0) {
     // next level
     $body.addClass('levelup');
@@ -293,6 +301,7 @@ function saveHighscore() {
     var msg = "I scored " + commafy(highscores[0].score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
     $tweet[0].href = 'http://twitter.com/?status=' + encodeURIComponent(msg);
     $replay.addClass('highscore');
+    serverLog(JSON.stringify(Marbles.history));
     return 'Yay! High score!';
   } else {
     $replay.removeClass('highscore');
@@ -318,6 +327,7 @@ function showHighscores(event) {
     var seed = this.getAttribute('data-seed');
     if (seed) {
       $body.removeClass('highscores');
+      Marbles.newGame();
       Marbles.seed(seed);
       initDraw();
     }
@@ -458,9 +468,7 @@ $('#tweet').touch(function (event) {
   event.preventDefault();
 });
 
-// $playagain.touchClick(newGame);
 $retryboard.touchClick(retryboard);
-// $grid.touchClick(selectMarble);
 
 $('#levelup').touchClick(levelUpNewGame);
 $('#highscore').touch(showHighscores);
