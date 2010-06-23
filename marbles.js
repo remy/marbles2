@@ -27,7 +27,7 @@ Marble.prototype.copy = function () {
   return mb;
 };
 Marble.prototype.tag = function (fn) {
-  Marbles.history.tagged[Marbles.level].push([this.x,this.y]);
+  Marbles.history.tagged[Marbles.level].taps.push([this.x,this.y]);
   return (Marbles.activeTags ? false : Marbles.tag(this.x, this.y, fn));
 };
 Marble.prototype.hasPartner = function() {
@@ -63,6 +63,14 @@ var Marbles = (function (undefined) {
   function getMarble(x, y) {
     return marbles[x] && marbles[x][y] ? marbles[x][y] : null;
   }
+  
+  function newLevelInHistory() {
+    return {
+      taps: [],
+      start: +new Date,
+      end: 0
+    };
+  }
 
   var marbles = [],
       empty = ' ',
@@ -80,7 +88,7 @@ var Marbles = (function (undefined) {
     activeTags: false,
     allowSingles: false,
     level: 1,
-    history: { tagged: {1:[]}, seed: seed.toString(16).toUpperCase(), score: score, level: 1 }, // use to submit scores to the server
+    history: { tagged: {1:newLevelInHistory()}, seed: seed.toString(16).toUpperCase(), score: score, level: 1 }, // use to submit scores to the server
     gameover: function (fn) {
       if (typeof fn == 'function') {
         gameoverCallback = fn;
@@ -91,7 +99,8 @@ var Marbles = (function (undefined) {
       
       this.history.score = this.getScore();
       this.history.level = this.level;
-      gameoverCallback.call(this);
+      this.history.tagged[this.level].end = +new Date;
+      gameoverCallback && gameoverCallback.call(this);
       
       return this;
     },
@@ -142,14 +151,14 @@ var Marbles = (function (undefined) {
       this.level = 1;
       score = 0;
       seed = Utils.seed();
-      this.history = { tagged: {1: []}, seed: this.seed(), score: score, level: this.level };
+      this.history = { tagged: {1: newLevelInHistory()}, seed: this.seed(), score: score, level: this.level };
       return this;
     },
     
     levelUp: function () {
       score = this.getScore();
       this.level++;
-      this.history.tagged[this.level] = [];
+      this.history.tagged[this.level] = newLevelInHistory();
       return this;
     },
     

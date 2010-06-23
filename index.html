@@ -15,7 +15,7 @@
 <div id="loading"></div>
 <div class="toolbar" id="toolbar">
   <div class="button" id="highscore"><img src="images/highscore.png" /><span id="hsn"></span></div>
-  <div class="button" id="start">New Game</div>
+  <div class="button newgame" id="start">New Game</div>
 </div>
 <div selected="true" id="grid"></div>
 <div id="levelup">
@@ -23,9 +23,9 @@
   <p>Starting new board in<span id="newGameCountdown">3</span></p>
 </div>
 <div id="replay">
-  <p id="msg">You lose!</p>
-  <a id="retryboard" href="#">Retry board</a>
-  <a id="tweet" href="#">Tweet!</a>
+  <div><p id="msg">Yay! High score!</p><a href="#" id="tweet">tweet</a></div>
+  <div class="replaybutton" id="retryboard">Retry</div>
+  <div class="replaybutton newgame">New</div>
 </div>
 <div id="status" class="toolbar">
   <span id="score">Score: 0</span>
@@ -74,12 +74,11 @@ var $ = xui,
     // baseWidth = 320,
     dim = { grid: [n,n], types: 3, marble: [~~(baseWidth/n),~~(baseWidth/n)] },
     $score = $('#score'),
-    $start = $('#start'),
     $retryboard = $('#retryboard'),
-    // $playagain = $('#playagain'),
+    $replay = $('#replay'),
     $marbles,
-    $highscoreTable = $('#highscoreTable'),
-    highscoreTable = $highscoreTable[0],
+    highscoreTable = $('#highscoreTable')[0],
+    $highscoresWrapper = $('#highscores'),
     highscores = JSON.parse(localStorage.getItem('highscores') || '[]') || [],
     playedBefore = localStorage ? localStorage.getItem('playedBefore') : null,
     lose = [
@@ -123,7 +122,7 @@ Marbles.gameover(function () {
     $body.addClass('levelup');
     levelUpTimer = setInterval(function () {
       var countdown = $('#newGameCountdown')[0];
-      if (countdown.innerHTML == 0) {
+      if (countdown.innerHTML == 1) {
         clearInterval(levelUpTimer);
         initDraw();
       } else {
@@ -217,7 +216,7 @@ function selectMarble(event) {
   if (m) { 
     m.tag();
     if (Marbles.activeTags) {
-      Marbles.clear();      
+      Marbles.clear();
     }
   }
 
@@ -291,9 +290,12 @@ function saveHighscore() {
   if (oldhighscore < score) {
     // genius: http://twitter.com/slevithan/status/11418431475
     $('#hsn')[0].innerHTML = commafy(score);
-    
-    return "Yay! High score!";
+    var msg = "I scored " + commafy(highscores[0].score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
+    $tweet[0].href = 'http://twitter.com/?status=' + encodeURIComponent(msg);
+    $replay.addClass('highscore');
+    return 'Yay! High score!';
   } else {
+    $replay.removeClass('highscore');
     return lose[~~(Math.random()*lose.length)];
   }
 }
@@ -309,9 +311,17 @@ function showHighscores(event) {
   var el = highscoreTable;
   el.innerHTML = '';
   highscores.forEach(function (score, i) {
-    el.innerHTML += '<tr><td>' + time.relative(score.date) +'</td><td>' + commafy(score.score) + '</td><td>' + (score.seed ? '<div class="playagain button" data-seed="' + score.seed + '" title="' + score.seed + '">Play</div>' : '&nbsp;') + '</td></tr>';
+    el.innerHTML += '<tr><td>' + commafy(score.score) + '</td><td>' + time.relative(score.date) +'</td><td>' + (score.seed ? '<div class="playagain button" data-seed="' + score.seed + '" title="' + score.seed + '">Play</div>' : '&nbsp;') + '</td></tr>';
   });
   
+  $highscoresWrapper.find('div.button').touch(function () {
+    var seed = this.getAttribute('data-seed');
+    if (seed) {
+      $body.removeClass('highscores');
+      Marbles.seed(seed);
+      initDraw();
+    }
+  });
   $body.addClass('highscores');
 }
 
@@ -436,10 +446,16 @@ var time = function () {
 $('#hsn').html(highscores.length ? commafy(highscores[0].score) : '');
 
 // event hook up
-$start.touch(newGame);
-$tweet.touch(function () {
-  var msg = "I just scored " + commafy(highscores[0].score) + " using this board: http://marbles2.com/app/?seed=" + Marbles.seed();
-  openURL('tweetie:///post?message=' + encodeURIComponent(msg), 'http://twitter.com/?status=' + encodeURIComponent(msg));
+$('.newgame').touch(newGame);
+
+$('#tweet').touch(function (event) {
+  var msg = this.search.replace(/\?status=/, '');
+    
+  // this is nasty, but on the desktop, tweetie url scheme handler is different to mobile :(
+  var tweetie = navigator.userAgent.indexOf('Mobile') === -1 ? 'tweetie:///' : 'tweetie:///post?message=';
+  
+  openURL(tweetie + msg, this.href);
+  event.preventDefault();
 });
 
 // $playagain.touchClick(newGame);
@@ -448,11 +464,6 @@ $retryboard.touchClick(retryboard);
 
 $('#levelup').touchClick(levelUpNewGame);
 $('#highscore').touch(showHighscores);
-
-$('#highscores').touchClick(function (event) {
-  prevent(event);
-  $body.removeClass('highscores');
-});
 
 $body.on('touchmove', prevent);
 
@@ -467,6 +478,8 @@ window.location.search.replace(/\bseed=([^&=]*)\b/, function (m, seed) {
   iframe.onload = function () {
     document.body.removeChild(iframe);
   };
+  
+  // this pops up an ugly window in Mobile WebKit - would be nice to surpress it
   iframe.contentWindow.location = 'marbles:///?seed=' + seed;
   Marbles.seed(seed); // handle the web based game using the seed
 });
@@ -482,26 +495,18 @@ if (!nativeapp && /iphone/i.test(navigator.userAgent) && !navigator.standalone &
 } else {
   // Run!
   if (window.Invoke_params) {
-    alert('using seed: ' + JSON.stringify(window.Invoke_params));
     Marbles.seed(window.Invoke_params.seed);
   }
   initDraw(true);
 }
 
 // event delegate the play button clicking
-$highscoreTable.on('click', function (event) {
-  console.log('ok', event.target);
-  var seed = event.target.getAttribute('data-seed');
-  if (event.target.className.match(/playagain/i) && seed) {
-    console.log(event.target, seed);
-    Marbles.seed(seed);
-    initDraw();
-  }
+$highscoresWrapper.touch(function (event) {
+  $body.removeClass('highscores');
 });
 
 $(document).on('deviceready', function () {
-  document.body.className = '';
-  // showHighscores();
+  document.body.className = 'gameover';
   setTimeout(startTimer, 1000);
 });
 
@@ -519,8 +524,6 @@ $('body').on('touchmove', function (e) {
   e.preventDefault();
 });
 
-// showHighscores();
-// alert(document.URL);
 // })();
 </script>
 </body>

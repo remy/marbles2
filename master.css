@@ -142,25 +142,25 @@ a {
   z-index: 10;
   display: none;
   position: absolute;
-  top: 25%;
+  top: 20%;
   margin: 0 auto;
   text-align: center;
-/*  width: 314px;*/
   width: 100%;
   -webkit-transform: opacity linear 100ms;
+  -o-transform: opacity linear 100ms;
+  transform: opacity linear 100ms;
   font-size: 28px;
 }
 
 #levelup {
   cursor: pointer;
-  top: 30%;
   border: 1px inset #505050;
-/*  border-style: none/hidden/dotted/dashed/solid/double/groove/ridge/inset/outset;*/
   background: #171717;
   -webkit-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
   -moz-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
   -o-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
   box-shadow: 0 0 5px rgba(255, 255, 255, .05);
+  
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
@@ -169,19 +169,15 @@ a {
   margin: 0 10%;
   width: 80%;
   padding: 20px 0;
-/*  background: #00c -webkit-gradient(linear, 0% 0%, 0% 75%, from(rgba(0,0,218,.4)), to(rgba(0,0,99,0.4)));*/
 }
 
 #levelup p {
   margin: 10px;
-/*  line-height: 28px;  */
-/*  line-height: 10px;*/
 }
 
 #newGameCountdown {
   position: absolute;
   margin-top: -5px;
-/*  font-family: georgia;*/
   margin-left: 5px;
   font-size: 28px;
 }
@@ -204,36 +200,59 @@ a {
   opacity: 0.3;
 }
 
-#replay a {
+#replay .replaybutton {
   text-decoration: none;
-  padding: 10px 40px;
-  font-size: 20px;
+  padding: 8px 12px;
+  font-size: 16px;
+  line-height: 18px;
   border: 3px solid #fff;
   -webkit-box-shadow: 0 0 4px rgba(255,255,255,0.8);
   -moz-box-shadow: 0 0 4px rgba(255,255,255,0.8);
   box-shadow: 0 0 4px rgba(255,255,255,0.8);
   text-shadow: 0 0 4px rgba(255,255,255,0.3);
-/*  background: #00c;
-  background: #00c -webkit-gradient(linear, 0% 0%, 0% 50%, from(#0000ff), to(#000063));
-*/
-  background: #242424;
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, rgba(0,0,0,0)), color-stop(0.5, rgba(255,255,255,.15)), color-stop(0.51, rgba(0,0,0,0)), color-stop(1, rgba(0,0,0,0)));
 
+  background: #242424;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, rgba(0,0,0,0)), color-stop(0.5, rgba(255,255,255,.05)), color-stop(0.51, rgba(0,0,0,0)), color-stop(1, rgba(0,0,0,0)));
   border-radius: 24px;
   -moz-border-radius: 24px;
   -webkit-border-radius: 24px;
-}
-
-#replay :nth-child(2) {
   margin-right: 10px;
+  width: 80px;
+  display: inline-block;
+  cursor: pointer;
 }
 
-#replay p {
+#replay a:last-child {
+  margin-right: 0px;
+}
+
+#msg {
+  display: inline;
   font-size: 28px;
   color: #fff;
   text-shadow: 1px 1px 3px rgba(255,255,255,.2);
   font-weight: bold;
-  margin: 40px 0;
+  line-height: 44px;
+}
+
+#replay div:first-child {
+  margin-bottom: 30px;
+}
+
+#tweet {
+  display: none;
+  text-indent: -999px;
+  overflow: hidden;
+  vertical-align: top;
+  height: 44px;
+  width: 44px;
+  background: url(images/twitter.png) center no-repeat;
+  cursor: pointer;
+/*  border: 1px solid #ccc;*/
+}
+
+#replay.highscore #tweet {
+  display: inline-block;
 }
 
 #timer {
@@ -476,8 +495,6 @@ a {
 .loading #loading {
   display: block;
 }
-
-
 
 
 

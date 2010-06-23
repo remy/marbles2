@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset=utf-8 />
+<title>Marbles Squared Validator</title>
+</head>
+<body>
+  <form>
+    <textarea id="data">{"tagged":{"1":[[2,0],[6,0],[5,2],[3,1],[4,1],[4,0],[3,0],[2,0],[2,0],[0,1],[0,3],[0,0]],"2":[[6,2],[6,2],[6,0],[6,0],[4,6],[2,5],[4,3],[2,0],[1,0]],"3":[[5,3],[2,1],[1,0],[4,1],[5,2],[1,2],[0,2],[3,0],[1,0],[0,1],[1,0],[1,0]],"4":[[0,4],[1,3],[5,3],[2,5],[5,5],[3,2],[4,0],[2,0],[0,0]]},"seed":"29A90870","score":3446,"level":4}</textarea>
+    <input type="submit" value="Validate Score" />
+  </form>
+<script src="marbles.js"></script>
+<script>
+var ta = document.querySelector('textarea'),
+    data = JSON.parse(ta.value),
+    dim = { grid: [7,7], types: 3 },
+    start,
+    end;
+
+Marbles.gameover(function () {});
+Marbles.seed(data.seed);
+Marbles.init(dim.grid[0], dim.grid[1], dim.types);
+
+for (var level = 1; level <= data.level; level++) { 
+  start = data.tagged[level].start;
+  for (var i = 0; i < data.tagged[level].taps.length; i++) {
+    Marbles.get(data.tagged[level].taps[i][0], data.tagged[level].taps[i][1]).tag();
+    Marbles.clear();
+  }
+  if (Marbles.marblesLeft() !== 0) {
+    // end of game
+    console.log('Game over: final level: ' + level + ', actual level: ' + Marbles.level + ', given score: ' + data.score + ', actual score: ' + Marbles.getScore());
+  } else {
+    end = data.tagged[level].end;
+    if (end - start > 10 * 1000) {
+      console.log('bonus over');
+      Marbles.bonusFinished();
+    }
+    console.log('level up');
+    // level up and continue
+    Marbles.levelUp();
+    Marbles.init(dim.grid[0], dim.grid[1], dim.types);
+  }
+}
+</script>
+</body>
+</html>
