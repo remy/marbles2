@@ -493,7 +493,7 @@ a {
   right: 0;
   width: 100%;
   height: 100%;
-  background: #000 url(Default.png) no-repeat bottom;
+  background: #000 url(Default.png) no-repeat center;
   z-index: 99;
   display: none;
 }
