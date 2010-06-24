@@ -116,7 +116,13 @@ $.fn.tween = function(css, options, callback) {
         
       } else { // use animated tweening
         if (options.easing) options.easing = stanardEasing[options.easing];
-        $el._tween(css, options, options.callback);
+        
+        // random hackage for XUI props containing duration - not sure why I'm being forced to do this...
+        for (var o in options) {
+          css[o] = options[o];
+        }
+        
+        $el._tween(css, options.callback);
       }
     });
   }

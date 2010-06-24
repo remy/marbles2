@@ -105,8 +105,8 @@ var $ = xui,
 
 
 var s = document.createElement('style');
-s.innerText = '#grid > div { height: ' + (~~(baseWidth/7)-5) + 'px; width: ' + (~~(baseWidth/7)-5) + 'px; } #grid { height: ' + baseWidth + 'px; left: ' + Math.ceil((bodyDims.width - (~~(baseWidth/n))*7)/2) + 'px; ; } html,body { height: ' + bodyDims.height + 'px;}';
 document.body.appendChild(s);
+s.innerHTML = s.innerText = '#grid > div { height: ' + (~~(baseWidth/7)-5) + 'px; width: ' + (~~(baseWidth/7)-5) + 'px; } #grid { height: ' + baseWidth + 'px; left: ' + Math.ceil((bodyDims.width - (~~(baseWidth/n))*7)/2) + 'px; ; } html,body { height: ' + bodyDims.height + 'px;}';
 
 Marbles.drawMarble = function (x, y, tagged, type) {
   var i = x + (Marbles.width * y);
@@ -188,7 +188,6 @@ function newTimer(width) {
   var countdown = $('#timer')[0], newCountdown = document.createElement('div');
   newCountdown.setAttribute('id', 'timer');
   if (width) newCountdown.style.width = width;
-  // newCountdown.innerHTML = '<span>Bonus</span>';
   newCountdown.className = 'toolbar';
   
   document.body.appendChild(newCountdown);
