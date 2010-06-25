@@ -114,7 +114,7 @@ try {
 Marbles.drawMarble = function (x, y, tagged, type) {
   var i = x + (Marbles.width * y);
   $marbles[x + (Marbles.width * y)].className = colours[type] || 'empty';
-  if (tagged) $marbles[i].className += ' selected';
+  if (tagged) $marbles[i].className += ' active';
 };
 
 Marbles.gameover(function () {
@@ -179,6 +179,11 @@ function initDraw(noTimer) {
   });
   $marbles = $grid.find('div'); //$($grid[0].getElementsByTagName('div'));
   $marbles.touch(selectMarble);
+  // $marbles.on('touchin', function () {
+  //   Marbles.get(this.x, this.y).tag();
+  // }).on('touchout', function () {
+  //   Marbles.untag();
+  // });
   gameActive = true;
   $score.html('Score: ' + commafy(Marbles.getScore()));
   
@@ -225,7 +230,9 @@ function selectMarble(event) {
   if (m) { 
     m.tag();
     if (Marbles.activeTags) {
-      Marbles.clear();
+      setTimeout(function () {
+        Marbles.clear();
+      }, 13);
     }
   }
 

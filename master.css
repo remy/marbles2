@@ -224,7 +224,7 @@ a {
   cursor: pointer;
 }
 
-#replay a:last-child {
+#replay .replaybutton:last-child {
   margin-right: 0px;
 }
 

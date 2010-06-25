@@ -9,8 +9,10 @@ document.body.ontouchmove = function (event) {
     over = document.elementFromPoint(event.targetTouches[0].pageX, event.targetTouches[0].pageY);
     
     if (!elementIn(over, down[0]) && over !== down[0]) {
+      down.fire('touchout');
       down.removeClass('active');
     } else {
+      down.fire('touchin');
       down.addClass('active');
     }
   }
@@ -31,6 +33,7 @@ function elementIn(element, context) {
 $.fn.touch = function (fn) {
   return touchSupport ? this.on('touchstart', function () {
     down = $(this).addClass('active');
+    down.fire('touchin');
   }).on('touchend', function (event) {
     down.removeClass('active');
     down = false;
