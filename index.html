@@ -29,7 +29,7 @@
 </div>
 <div id="status" class="toolbar">
   <span id="score">Score: 0</span>
-  <span id="potential">Streak: 1</span>
+  <span id="potential">Level: 0</span>
 </div>
 <div id="saveToSpring"></div>
 <div id="timer" class="toolbar"></div>
@@ -147,7 +147,7 @@ function initDraw(noTimer) {
   $body.removeClass('levelup');
   var countdown = $('#newGameCountdown')[0];
   countdown.innerHTML = '3';
-  $potential.html('Streak: ' + Marbles.level);
+  $potential.html('Level: ' + (Marbles.level - 1));
   Marbles.init(dim.grid[0], dim.grid[1], dim.types);
   
   // var divs = $grid[0].getElementsByTagName('div');
