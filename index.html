@@ -230,9 +230,7 @@ function selectMarble(event) {
   if (m) { 
     m.tag();
     if (Marbles.activeTags) {
-      setTimeout(function () {
-        Marbles.clear();
-      }, 13);
+      Marbles.clear();
     }
   }
 
