@@ -32,10 +32,10 @@ textarea {
 <script src="marbles.js"></script>
 <script>
 
-document.querySelector('form').onsubmit = function () {
+document.querySelector('form').addEventListener('submit', function (event) {
+  event.preventDefault();
   run();
-  return false;
-};
+}, false);
 
 function run() {
   var ta = document.querySelector('textarea'),
