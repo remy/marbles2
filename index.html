@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta id="meta" name="viewport" content="width=device-width; user-scalable=no; initial-scale=1.0" />
+<meta id="meta" name="viewport" content="width=device-width; height=device-height; user-scalable=no; initial-scale=1.0" />
 <meta charset=utf-8 />
 <title>Marbles²</title>
 <link href='marbles-squared.png' rel='apple-touch-icon' />
@@ -147,7 +147,7 @@ function initDraw(noTimer) {
   $body.removeClass('levelup');
   var countdown = $('#newGameCountdown')[0];
   countdown.innerHTML = '3';
-  $potential.html('Level: ' + (Marbles.level - 1));
+  $potential.html('Level: ' + Marbles.level);
   Marbles.init(dim.grid[0], dim.grid[1], dim.types);
   
   // var divs = $grid[0].getElementsByTagName('div');
@@ -295,7 +295,7 @@ function saveHighscore() {
   highscores.push({ score: score, date: +new Date(), level: Marbles.level, seed: Marbles.seed() });
   highscores = highscores.sort(function (a, b) {
     return b.score > a.score ? 1 : -1;
-  }).slice(0, 10); // limit to 10;
+  }).slice(0, 9); // limit to 10;
   
   try {
     // annoying that Safari occassionally breaks here for no reason
