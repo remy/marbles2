@@ -291,7 +291,7 @@ function removeSave(event) {
 }
 
 function saveHighscore() {
-  var score = Marbles.getScore(), oldhighscore = highscores.length ? highscores[0].score : 0;
+  var score = Marbles.getScore();
   highscores.push({ score: score, date: +new Date(), level: Marbles.level, seed: Marbles.seed() });
   highscores = highscores.sort(function (a, b) {
     return b.score > a.score ? 1 : -1;
@@ -302,14 +302,14 @@ function saveHighscore() {
     localStorage.setItem('highscores', JSON.stringify(highscores));    
   } catch (e) {}
   
-  if (oldhighscore < score) {
+  if (highscores.length === 0 || highscores[highscores.length-1].score < score) {
     // genius: http://twitter.com/slevithan/status/11418431475
     $('#hsn')[0].innerHTML = commafy(score);
     var msg = "I scored " + commafy(highscores[0].score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
     $tweet[0].href = 'http://twitter.com/?status=' + encodeURIComponent(msg);
     $replay.addClass('highscore');
     serverLog(JSON.stringify(Marbles.history));
-    return 'Yay! High score!';
+    return 'Yay! A highscore!';
   } else {
     $replay.removeClass('highscore');
     return lose[~~(Math.random()*lose.length)];
@@ -355,7 +355,7 @@ function getIFrame() {
 function openURL(url, def) {
   var iframe = getIFrame();
   document.body.appendChild(iframe);
-  
+
   if (!nativeapp) {
     window.location = def;
     return;
@@ -363,8 +363,9 @@ function openURL(url, def) {
   
   var sandbox = iframe.contentWindow;
   try {
-    var ok = iframe.contentWindow.eval('location = "' + url + '";');
+    iframe.contentWindow.location = url;
   } catch (e) {
+    alert('err');
     window.location = def;
   }
 }

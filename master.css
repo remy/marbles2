@@ -248,9 +248,8 @@ a {
   vertical-align: top;
   height: 44px;
   width: 44px;
-  background: url(images/twitter.png) center no-repeat;
+  background: url(images/t_logo-c.png) center no-repeat;
   cursor: pointer;
-/*  border: 1px solid #ccc;*/
 }
 
 #replay.highscore #tweet {
