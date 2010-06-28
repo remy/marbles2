@@ -1,6 +1,8 @@
 (function ($) {
 var down,
-    touchSupport = !!($.touch);
+    touchSupport = ('createTouch' in document);
+    
+alert(touchSupport);
     
 document.body.ontouchmove = function (event) {
   var over;
