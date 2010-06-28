@@ -52,6 +52,10 @@ function run() {
   Marbles.seed(data.seed);
   Marbles.init(dim.grid[0], dim.grid[1], dim.types);
 
+  if (!data.tagged && data.data.tagged) {
+    data = data.tagged;
+  }
+
   for (var level = 1; level <= data.level; level++) { 
     start = data.tagged[level].start;
     end = data.tagged[level].end;
