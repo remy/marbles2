@@ -25,7 +25,7 @@ textarea {
 </head>
 <body>
   <form>
-    <textarea id="data">{"tagged":{"1":{"taps":[[2,3],[2,3],[3,2],[2,1],[2,0],[1,1],[1,0],[0,0],[0,0],[1,2],[0,1],[5,4],[5,3],[5,2],[4,0],[3,0]],"start":1277332132225,"end":1277332152206}},"seed":"4C228AA4","score":544,"level":1}</textarea>
+    <textarea id="data">{"tagged":{"1":{"taps":[[0,2],[1,1],[2,1],[2,0],[1,1],[1,1],[1,0],[1,0],[1,0],[1,0]],"start":1277710727678,"end":1277710739105},"2":{"taps":[[1,1],[5,4],[5,4],[5,4],[5,0],[5,0],[1,1],[1,1],[1,1],[1,1],[1,0]],"start":1277710742108,"end":1277710752189},"3":{"taps":[[2,2],[5,5],[3,3],[6,2],[1,2],[1,1],[0,0],[0,0]],"start":1277710755192,"end":1277710761499},"4":{"taps":[[2,2],[2,3],[5,3],[4,2],[2,1],[1,1],[0,1],[0,0],[2,0],[0,0]],"start":1277710764502,"end":1277710771749},"5":{"taps":[[1,1],[2,3],[5,2],[6,1],[5,1],[1,2],[0,2],[0,1]],"start":1277710774752,"end":1277710785549}},"seed":"4C27DE1E","score":6736,"level":5}</textarea>
     <input type="submit" value="Validate Score" />
     <p id="result"></p>
   </form>
@@ -42,11 +42,12 @@ function run() {
       data = JSON.parse(ta.value),
       result = document.querySelector('#result'),
       dim = { grid: [7,7], types: 3 },
+      gameRunning = true,
       start,
       end;
 
   Marbles.gameover(function () {
-    // console.log('game over: ' + this.getScore());
+    gameRunning = false;
   });
   Marbles.newGame();
   Marbles.seed(data.seed);
@@ -64,22 +65,25 @@ function run() {
     } 
     
     for (var i = 0; i < data.tagged[level].taps.length; i++) {
-      Marbles.get(data.tagged[level].taps[i][0], data.tagged[level].taps[i][1]).tag();
-      Marbles.clear();
+      if (gameRunning) {
+        Marbles.get(data.tagged[level].taps[i][0], data.tagged[level].taps[i][1]).tag();
+        Marbles.clear();
+      }
     }
     
     if (Marbles.marblesLeft() !== 0) {
       // end of game
       result.innerHTML = 'Game over: final level: ' + level + ', actual level: ' + Marbles.level + ', given score: ' + data.score + ', actual score: ' + Marbles.getScore();
       result.className = data.score == Marbles.getScore() ? 'ok' : 'fail';
-      
     } else {
       // level up and continue
+      gameRunning = true;
       Marbles.levelUp();
       Marbles.init(dim.grid[0], dim.grid[1], dim.types);
     }
   }
 }
+
 </script>
 </body>
 </html>
