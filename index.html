@@ -291,7 +291,7 @@ function removeSave(event) {
 }
 
 function saveHighscore() {
-  var score = Marbles.getScore();
+  var score = Marbles.getScore(), newHighscore = highscores.length === 0;
   highscores.push({ score: score, date: +new Date(), level: Marbles.level, seed: Marbles.seed() });
   highscores = highscores.sort(function (a, b) {
     return b.score > a.score ? 1 : -1;
@@ -302,7 +302,7 @@ function saveHighscore() {
     localStorage.setItem('highscores', JSON.stringify(highscores));    
   } catch (e) {}
   
-  if (highscores.length === 0 || highscores[highscores.length-1].score < score) {
+  if (newHighscore || highscores[highscores.length-1].score < score) {
     // genius: http://twitter.com/slevithan/status/11418431475
     $('#hsn')[0].innerHTML = commafy(score);
     var msg = "I scored " + commafy(highscores[0].score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
