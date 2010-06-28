@@ -15,6 +15,11 @@ textarea {
   padding: 5px;
   color: #fff;
 }
+
+#result a {
+  color: #fff;
+}
+
 #result.ok {
   background: #0c0;
 }
@@ -32,14 +37,21 @@ textarea {
 <script src="marbles.js"></script>
 <script>
 
+var ta = document.querySelector('textarea'),
+    oldData = sessionStorage.getItem('d');
+
+if (oldData) {
+  ta.value = oldData;
+}
+
 document.querySelector('form').addEventListener('submit', function (event) {
   event.preventDefault();
+  sessionStorage.setItem('d', ta.value);
   run();
 }, false);
 
 function run() {
-  var ta = document.querySelector('textarea'),
-      data = JSON.parse(ta.value),
+  var data = JSON.parse(ta.value),
       result = document.querySelector('#result'),
       dim = { grid: [7,7], types: 3 },
       gameRunning = true,
@@ -49,13 +61,13 @@ function run() {
   Marbles.gameover(function () {
     gameRunning = false;
   });
+  if (data.data && data.data.tagged) {
+    data = data.data; 
+  }
+
   Marbles.newGame();
   Marbles.seed(data.seed);
   Marbles.init(dim.grid[0], dim.grid[1], dim.types);
-
-  if (data.data && data.data.tagged) {
-    data = data.tagged; 
-  }
 
   for (var level = 1; level <= data.level; level++) { 
     start = data.tagged[level].start;
@@ -73,7 +85,7 @@ function run() {
     
     if (Marbles.marblesLeft() !== 0) {
       // end of game
-      result.innerHTML = 'Game over: final level: ' + level + ', actual level: ' + Marbles.level + ', given score: ' + data.score + ', actual score: ' + Marbles.getScore();
+      result.innerHTML = 'Game over: seed: <a href="http://marbles2.com/app?seed=' + data.seed + '">' + data.seed + '</a>, final level: ' + level + ', actual level: ' + Marbles.level + ', given score: ' + data.score + ', actual score: ' + Marbles.getScore();
       result.className = data.score == Marbles.getScore() ? 'ok' : 'fail';
     } else {
       // level up and continue
