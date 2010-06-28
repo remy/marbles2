@@ -29,34 +29,50 @@ textarea {
 </style>
 </head>
 <body>
-  <form>
-    <textarea id="data">{"tagged":{"1":{"taps":[[0,2],[1,1],[2,1],[2,0],[1,1],[1,1],[1,0],[1,0],[1,0],[1,0]],"start":1277710727678,"end":1277710739105},"2":{"taps":[[1,1],[5,4],[5,4],[5,4],[5,0],[5,0],[1,1],[1,1],[1,1],[1,1],[1,0]],"start":1277710742108,"end":1277710752189},"3":{"taps":[[2,2],[5,5],[3,3],[6,2],[1,2],[1,1],[0,0],[0,0]],"start":1277710755192,"end":1277710761499},"4":{"taps":[[2,2],[2,3],[5,3],[4,2],[2,1],[1,1],[0,1],[0,0],[2,0],[0,0]],"start":1277710764502,"end":1277710771749},"5":{"taps":[[1,1],[2,3],[5,2],[6,1],[5,1],[1,2],[0,2],[0,1]],"start":1277710774752,"end":1277710785549}},"seed":"4C27DE1E","score":6736,"level":5}</textarea>
-    <input type="submit" value="Validate Score" />
-    <p id="result"></p>
-  </form>
+<p id="result"></p>
 <script src="marbles.js"></script>
+<script src="jquery.min.js"></script>
+<script src="../twitterlib.js"></script>
 <script>
+var alldata = {}, data = {};
 
-var ta = document.querySelector('textarea'),
-    oldData = sessionStorage.getItem('d');
+$.ajax({
+  url: 'data.php',
+  dataType: 'json',
+  success: function (json) {
+    json.forEach(function (logdata) {
+      alldata[logdata.data.seed + logdata.data.score] = logdata;
+    });
+    
+    find();
+  }
+});
 
-if (oldData) {
-  ta.value = oldData;
+function find() {
+  twitterlib.search('marbles2.com', function (tweets) {
+    tweets.forEach(function (tweet) {
+      var text = tweet.text,
+          seed,
+          score;
+      s.replace(/([0-9,]+).*seed=(.*)\b/, function (foo, sc, se) { 
+        score = sc.replace(/[^0-9]/g, '');
+        seed = se;
+      });
+
+      console.log('searching for seed: ' + seed + ', score: ' + score);
+      data = alldata[seed + score];
+      var ok = run();
+      console.log('valid score: ' + ok);
+    });
+  });
 }
 
-document.querySelector('form').addEventListener('submit', function (event) {
-  event.preventDefault();
-  sessionStorage.setItem('d', ta.value);
-  run();
-}, false);
-
 function run() {
-  var data = JSON.parse(ta.value),
-      result = document.querySelector('#result'),
-      dim = { grid: [7,7], types: 3 },
+  var dim = { grid: [7,7], types: 3 },
       gameRunning = true,
       start,
-      end;
+      end,
+      ok;
 
   Marbles.gameover(function () {
     gameRunning = false;
@@ -85,8 +101,7 @@ function run() {
     
     if (Marbles.marblesLeft() !== 0) {
       // end of game
-      result.innerHTML = 'Game over: seed: <a href="http://marbles2.com/app?seed=' + data.seed + '">' + data.seed + '</a>, final level: ' + level + ', actual level: ' + Marbles.level + ', given score: ' + data.score + ', actual score: ' + Marbles.getScore();
-      result.className = data.score == Marbles.getScore() ? 'ok' : 'fail';
+      ok = data.score == Marbles.getScore() ? true : false;
     } else {
       // level up and continue
       gameRunning = true;
@@ -94,6 +109,8 @@ function run() {
       Marbles.init(dim.grid[0], dim.grid[1], dim.types);
     }
   }
+  
+  return ok;
 }
 
 </script>
