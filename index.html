@@ -304,7 +304,10 @@ function saveHighscore() {
   
   if (newHighscore || highscores[highscores.length-1].score < score) {
     // genius: http://twitter.com/slevithan/status/11418431475
-    $('#hsn')[0].innerHTML = commafy(score);
+    if (highscores[0].score <= score) {
+      $('#hsn')[0].innerHTML = commafy(score);      
+    }
+    
     var msg = "I scored " + commafy(highscores[0].score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
     $tweet[0].href = 'http://twitter.com/?status=' + encodeURIComponent(msg);
     $replay.addClass('highscore');
