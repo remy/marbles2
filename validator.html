@@ -37,7 +37,7 @@ textarea {
 var alldata = {}, data = {};
 
 $.ajax({
-  url: 'data.php',
+  url: '../data.php',
   dataType: 'json',
   success: function (json) {
     json.forEach(function (logdata) {
@@ -45,6 +45,9 @@ $.ajax({
     });
     
     find();
+  },
+  error: function () { 
+    console.log([].slice.call(arguments));
   }
 });
 
@@ -54,15 +57,18 @@ function find() {
       var text = tweet.text,
           seed,
           score;
-      s.replace(/([0-9,]+).*seed=(.*)\b/, function (foo, sc, se) { 
+      text.replace(/([0-9,]+).*seed=(\w+)\b/, function (foo, sc, se) { 
         score = sc.replace(/[^0-9]/g, '');
         seed = se;
       });
 
-      console.log('searching for seed: ' + seed + ', score: ' + score);
-      data = alldata[seed + score];
-      var ok = run();
-      console.log('valid score: ' + ok);
+      if (seed && score && alldata[seed+score]) {
+        console.log('searching for seed: ' + seed + ', score: ' + score);
+        data = alldata[seed + score];
+        var ok = run();
+        console.log('valid score: ' + ok);
+        console.log(tweet.user.screen_name, data.score, data.seed);
+      }
     });
   });
 }
