@@ -308,7 +308,7 @@ function saveHighscore() {
       $('#hsn')[0].innerHTML = commafy(score);      
     }
     
-    var msg = "I scored " + commafy(highscores[0].score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
+    var msg = "I scored " + commafy(score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
     $tweet[0].href = 'http://twitter.com/?status=' + encodeURIComponent(msg);
     $replay.addClass('highscore');
     serverLog(JSON.stringify(Marbles.history));
