@@ -505,25 +505,24 @@ window.location.search.replace(/\bseed=([^&=]*)\b/, function (m, seed) {
 });
 
 // horrible, but adds a tiny bit of nice ux
-// if (!nativeapp && /iphone/i.test(navigator.userAgent) && !navigator.standalone && !playedBefore ) {
-//   try {
-//     localStorage.setItem('playedBefore', true);    
-//   } catch (e) {}
+if (!nativeapp && /iphone/i.test(navigator.userAgent) && !navigator.standalone && !playedBefore ) {
+  try {
+    localStorage.setItem('playedBefore', true);    
+  } catch (e) {}
   document.body.className = 'saveToSpring';
-  console.log(document.body.className);
   $(document).oneTouchClick(removeSave);
   initDraw(true);
-// } else {
-//   // Run!
-//   if (window.Invoke_params) {
-//     Marbles.seed(window.Invoke_params.seed);
-//   }
-//   initDraw(true);
-    // $(document).on('deviceready', function () {
-    //   document.body.className = '';
-    //   setTimeout(startTimer, 1000);
-    // });
-// }
+} else {
+  // Run!
+  if (window.Invoke_params) {
+    Marbles.seed(window.Invoke_params.seed);
+  }
+  initDraw(true);
+  $(document).on('deviceready', function () {
+    document.body.className = '';
+    setTimeout(startTimer, 1000);
+  });
+}
 
 // event delegate the play button clicking
 $highscoresWrapper.touch(function (event) {
