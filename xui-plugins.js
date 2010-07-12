@@ -1,6 +1,6 @@
 (function ($) {
 var down,
-    touchSupport = ('createTouch' in document);
+    touchSupport = $.touch;
     
 document.body.ontouchmove = function (event) {
   var over;
@@ -47,6 +47,17 @@ $.fn.touch = function (fn) {
 
 $.fn.touchClick = function (fn) {
   return this.on('touchstart', fn).on('click', fn);
+};
+
+$.fn.oneTouchClick = function (fn) {
+  // console.log('bind');
+  var cb = function () {
+    // console.log('removing from', this, this._xuiEventID);
+    $(this).un('touchstart', cb).un('click', cb);
+    fn.apply(this, arguments);
+  }
+  this.on('touchstart', cb).on('click', cb);
+  // console.log(this[0]._xuiEventID);
 };
   
 })(xui);
