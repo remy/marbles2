@@ -13,11 +13,6 @@ textarea {
 }
 #result {
   padding: 5px;
-  color: #fff;
-}
-
-#result a {
-  color: #fff;
 }
 
 #result.ok {
@@ -29,47 +24,82 @@ textarea {
 </style>
 </head>
 <body>
-<p id="result"></p>
+<pre><code id="result"></code></pre>
 <script src="marbles.js"></script>
 <script src="jquery.min.js"></script>
 <script src="twitterlib.js"></script>
 <script>
-var alldata = {}, data = {};
+var alldata = {}, data = {}, result = document.getElementById('result'), scores = [], html = {};
 
-$.ajax({
-  url: '../data.php',
-  dataType: 'json',
-  success: function (json) {
-    json.forEach(function (logdata) {
-      alldata[logdata.data.seed + logdata.data.score] = logdata;
+twitterlib.search('marbles2.com', function (tweets) {
+  tweets.forEach(function (tweet) {
+    var text = tweet.text,
+        seed,
+        score;
+    text.replace(/([0-9,]+).*seed=(\w+)\b/, function (foo, sc, se) { 
+      score = sc.replace(/[^0-9]/g, '');
+      seed = se;
     });
     
-    find();
-  },
-  error: function () { 
-    console.log([].slice.call(arguments));
-  }
-});
-
-function find() {
-  twitterlib.search('marbles2.com', function (tweets) {
-    tweets.forEach(function (tweet) {
-      var text = tweet.text,
-          seed,
-          score;
-      text.replace(/([0-9,]+).*seed=(\w+)\b/, function (foo, sc, se) { 
-        score = sc.replace(/[^0-9]/g, '');
-        seed = se;
-      });
-
-      if (seed && score && alldata[seed+score]) {
-        console.log('searching for seed: ' + seed + ', score: ' + score);
-        data = alldata[seed + score];
+    find(seed, function () {
+      if (seed && score && alldata[score]) {
+        // console.log('searching for seed: ' + seed + ', score: ' + score);
+        data = alldata[score];
         var ok = run();
-        console.log('valid score: ' + ok);
-        console.log(tweet.user.screen_name, data.score, data.seed);
+        // console.log('valid score: ' + ok);
+        var h = ('<tr>\n  <td><a href="http://twitter.com/' + tweet.user.screen_name + '">@' + tweet.user.screen_name + '</a></td>\n  <td>' + commafy(data.score) + '</td>\n  <td><a target="game" href="http://marbles2.com/app/?seed=' + data.seed + '">Play</a></td>\n</tr>\n').replace(/[<>&]/g, function (m) {
+          return {
+            '<' : '&lt;',
+            '>' : '&gt;',
+            '&' : '&amp;'
+          }[m];
+        });
+        if (html[score]) {
+          html[score] += h;
+        } else {
+          html[score] = h;
+          scores.push(parseInt(score));
+          scores = scores.sort(function (a, b) {
+            return b < a ? -1 : 1;
+          });
+        }
+        
+        // stupid, but can't be bothered to do a callback once it's finished
+        result.innerHTML = '';
+        scores.forEach(function (s) {
+          result.innerHTML += html[s];
+        });
+        
+        // console.log(tweet.user.screen_name, data.score, data.seed);
       }
     });
+  });
+  
+  // scores.sort();
+});
+
+function commafy(n) {
+  return n.toString().replace(/(^|[^\w.])(\d{4,})/g, function($0,$1,$2) {
+    return $1 + $2.replace(/\d(?=(?:\d\d\d)+(?!\d))/g, "$&,");
+  });
+}
+
+
+
+function find(seed, callback) {
+  $.ajax({
+    url: '../data.php?seed=' + seed,
+    dataType: 'json',
+    success: function (json) {
+      json.forEach(function (logdata) {
+        alldata[logdata.data.score] = logdata;
+      });
+
+      callback();
+    },
+    error: function (xhr, desc) { 
+      console.log(xhr, desc);
+    }
   });
 }
 
