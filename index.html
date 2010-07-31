@@ -178,7 +178,7 @@ function initDraw(noTimer) {
     });
   });
   $marbles = $grid.find('div'); //$($grid[0].getElementsByTagName('div'));
-  $marbles.touch(selectMarble);
+  $marbles.touchClick(selectMarble);
   // $marbles.on('touchin', function () {
   //   Marbles.get(this.x, this.y).tag();
   // }).on('touchout', function () {
@@ -285,7 +285,6 @@ function levelUpNewGame(event) {
 }
 
 function removeSave(event) {
-  console.log('removeSave callback via ' + event.type);
   document.body.className = '';
   startTimer();
   event && event.preventDefault && event.preventDefault();
@@ -313,7 +312,7 @@ function saveHighscore() {
     $tweet[0].href = 'http://twitter.com/?status=' + encodeURIComponent(msg);
     $replay.addClass('highscore');
     serverLog(JSON.stringify(Marbles.history));
-    return 'New high score: ' + commafy(score) + '!';
+    return 'High score: ' + commafy(score) + '!';
   } else {
     $replay.removeClass('highscore');
     return lose[~~(Math.random()*lose.length)];
