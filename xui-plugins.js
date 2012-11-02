@@ -8,7 +8,7 @@ document.body.ontouchmove = function (event) {
   if (down !== false) {
     over = document.elementFromPoint(event.targetTouches[0].pageX, event.targetTouches[0].pageY);
     
-    if (!elementIn(over, down[0]) && over !== down[0]) {
+    if (over && !elementIn(over, down[0]) && over !== down[0]) {
       down.fire('touchout');
       down.removeClass('active');
     } else {
@@ -42,7 +42,18 @@ $.fn.touch = function (fn) {
     if (over === this || elementIn(over, this)) {
       fn.call(this, event);
     }
-  }) : this.on('click', fn);
+  }) : this.on('mousedown', function () {
+    down = $(this).addClass('active');
+    down.fire('touchin');
+  }).on('mouseup', function (event) {
+    down.removeClass('active');
+    down = false;
+
+    var over = document.elementFromPoint(event.pageX, event.pageY);
+    if (over === this || elementIn(over, this)) {
+      fn.call(this, event);
+    }
+  });
 };
 
 $.fn.touchClick = function (fn) {
