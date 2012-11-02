@@ -1,4 +1,5 @@
-// poor man's JSON parser - we're only using it for private data
+/*global xui:true, Marbles:true */
+
 // (function () {
 var $ = window.xui,
     bonusTimer,
@@ -11,9 +12,9 @@ var $ = window.xui,
     // dimension information - 7x7 grid, 3 types
     nativeapp = (window.innerHeight === 460 && !navigator.standalone) ? 1 : false, // this sucks, but it's the only way to work it out
     comp = window.getComputedStyle(document.body,null),
-    bodyDims = { height: parseInt(comp['height']) - (nativeapp ? 20 : 0), width: parseInt(comp['width']) },
+    bodyDims = { height: parseInt(comp['height'], 10) - (nativeapp ? 20 : 0), width: parseInt(comp['width'], 10) },
     whichBaseLine = bodyDims.width > bodyDims.height ? 'height' : 'width',
-    controlHeight = bodyDims.height - bodyDims.width < 90 ? 90 : 0, // 90 = 44 * 2 + 2px border 
+    controlHeight = bodyDims.height - bodyDims.width < 90 ? 90 : 0, // 90 = 44 * 2 + 2px border
     baseWidth = (bodyDims.width > bodyDims.height ? bodyDims.height : bodyDims.width) - controlHeight,
     // baseWidth = 320,
     dim = { grid: [n,n], types: 3, marble: [~~(baseWidth/n),~~(baseWidth/n)] },
@@ -38,44 +39,156 @@ var $ = window.xui,
     $body = $(document.body),
     $tweet = $('#tweet');
 
-
-var s = document.createElement('style');
-document.body.appendChild(s);
-s.innerText = '#grid > div { height: ' + (~~(baseWidth/7)-5) + 'px; width: ' + (~~(baseWidth/7)-5) + 'px; } #grid { height: ' + baseWidth + 'px; left: ' + Math.ceil((bodyDims.width - (~~(baseWidth/n))*7)/2) + 'px; ; } html,body { height: ' + bodyDims.height + 'px;}';
-try {
-  s.innerHTML = s.innerText;
-} catch (e) {} // fails only on the WebkitMobile **hardware** environment
-
-Marbles.drawMarble = function (x, y, tagged, type) {
-  var i = x + (Marbles.width * y);
-  $marbles[x + (Marbles.width * y)].className = colours[type] || 'empty';
-  if (tagged) $marbles[i].className += ' active';
-};
-
-Marbles.gameover(function () {
-  var movesLeft = this.movesLeft(), msg = '';
+var time = (function () {
+  var monthDict = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return {
+    time: function (date) {
+      var hour = date.getHours(),
+          min = date.getMinutes() + "",
+          ampm = 'am';
   
-  stopTimer();
-  
-  if (movesLeft === 0 && this.marblesLeft() !== 0) {
-    gameActive = false;
-    msg = saveHighscore();
-    $('#msg').html(msg);
-    $body.addClass('gameover');
-  } else if (movesLeft === 0 && this.marblesLeft() === 0) {
-    // next level
-    $body.addClass('levelup');
-    levelUpTimer = setInterval(function () {
-      var countdown = $('#newGameCountdown')[0];
-      if (countdown.innerHTML == 1) {
-        clearInterval(levelUpTimer);
-        levelUpNewGame();
-      } else {
-        countdown.innerHTML = countdown.innerHTML - 1;
+      if (hour === 0) {
+        hour = 12;
+      } else if (hour === 12) {
+        ampm = 'pm';
+      } else if (hour > 12) {
+        hour -= 12;
+        ampm = 'pm';
       }
-    }, 1000);
+  
+      if (min.length === 1) {
+        min = '0' + min;
+      }
+  
+      return hour + ampm;
+    },
+    date: function (date) {
+      var ds = date.toDateString().split(/ /),
+          mon = monthDict[date.getMonth()],
+          day = date.getDate()+'',
+          dayi = ~~(day),
+          year = date.getFullYear(),
+          thisyear = (new Date()).getFullYear(),
+          th = 'th';
+
+      // anti-'th' - but don't do the 11th, 12th or 13th
+      if ((dayi % 10) === 1 && dayi !== 11) {
+        th = 'st';
+      } else if ((dayi % 10) === 2 && day.substr(0, 1) !== '1') {
+        th = 'nd';
+      } else if ((dayi % 10) === 3 && day.substr(0, 1) !== '1') {
+        th = 'rd';
+      }
+
+      if (day.substr(0, 1) === '0') {
+        day = day.substr(1);
+      }
+
+      return mon + ' ' + day + th + (thisyear !== year ? ', ' + year : '');
+    },
+    datetime: function (t) {
+      var date = new Date(t);
+
+      return this.time(date) + ' ' + this.date(date);
+    },
+    relative: function (t) {
+      var date = new Date(t),
+          relative_to = (arguments.length > 1) ? arguments[1] : new Date(),
+          delta = ~~((relative_to.getTime() - t) / 1000),
+          r = '';
+
+      // delta = delta + (relative_to.getTimezoneOffset() * 60);
+
+      if (delta < 60) {
+        r = 'just now';
+      } else if (delta < 120) {
+        r = 'a minute ago';
+      } else if (delta < (45*60)) {
+        r = (~~(delta / 60)).toString() + ' mins ago';
+      } else if (delta < (2*90*60)) { // 2* because sometimes read 1 hours ago
+        r = (~~(delta / 60)).toString() + ' mins ago';
+        // r = '1 hour ago';
+      } else if (delta < (24*60*60)) {
+        r = (~~(delta / 3600)).toString() + ' hours ago';
+      } else {
+        if (delta < (48*60*60)) {
+          r = this.time(date) + ' yesterday';
+        } else {
+          r = this.date(date); //  this.time(date) + ' ' +
+        }
+      }
+
+      return r;
+    }
+  };
+})();
+
+function prevent(event) {
+  if (event && event.preventDefault) {
+    event.preventDefault();
   }
-});
+
+  if (event && event.stopPropagation) {
+    event.stopPropagation();
+  }
+}
+
+function serverLog(message) {
+  var client = new XMLHttpRequest();
+  client.open("POST", "http://marbles2.com/log.php");
+  client.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  client.send('data='+encodeURIComponent(message));
+}
+
+function commafy(n) {
+  return n.toString().replace(/(^|[^\w.])(\d{4,})/g, function($0,$1,$2) {
+    return $1 + $2.replace(/\d(?=(?:\d\d\d)+(?!\d))/g, "$&,");
+  });
+}
+
+function newTimer(width) {
+  var countdown = $('#timer')[0], newCountdown = document.createElement('div');
+  newCountdown.setAttribute('id', 'timer');
+  if (width) {
+    newCountdown.style.width = width;
+  }
+  newCountdown.className = 'toolbar';
+  
+  document.body.appendChild(newCountdown);
+  countdown.parentNode.removeChild(countdown);
+}
+
+function selectMarble(event) {
+  prevent(event);
+  
+  if (!gameActive) {
+    return;
+  }
+
+  var t = this, //event.target,
+      m = Marbles.get(t.x, t.y);
+
+  if (m) {
+    m.tag();
+    if (Marbles.activeTags) {
+      Marbles.clear();
+    }
+  }
+
+  $score.html('Score: ' + commafy(Marbles.getScore()));
+}
+
+function startTimer() {
+  // reset
+  newTimer();
+  $('#timer').tween({ width : 0 + 'px' }, { duration: 10 * 1000, easing: 'linear', callback: function () {
+    Marbles.bonusFinished();
+  }});
+}
+
+function stopTimer() {
+  newTimer(getComputedStyle(document.getElementById('timer'), null).width);
+}
 
 function initDraw(noTimer) {
   clearInterval(levelUpTimer); // just in case
@@ -93,10 +206,10 @@ function initDraw(noTimer) {
     this.parentNode.removeChild(this);
   });
   
-  $body.removeClass('gameover');  
+  $body.removeClass('gameover');
   
   // rebuild
-  var h = parseInt(Marbles.height * dim.marble[1]), w = parseInt(Marbles.width * dim.marble[0]);
+  var h = parseInt(Marbles.height * dim.marble[1], 10), w = parseInt(Marbles.width * dim.marble[0], 10);
   $grid.css({ 'width': w, 'height': h });
   $('#grid').css('width', w);
   Marbles.loop(function (x,y) {
@@ -106,28 +219,28 @@ function initDraw(noTimer) {
     d.y = y;
     d.className = colours[m.type]; // should never be tagged during this point
     $grid[0].appendChild(d);
-    $(d).css({ 
-      'background': colours[m.tagged] || 'empty', 
-      'left': parseInt(x * dim.marble[0]) + 'px',
-      'top': parseInt(h - dim.marble[1] - (y * dim.marble[1])) + 'px'
+    $(d).css({
+      'background': colours[m.tagged] || 'empty',
+      'left': parseInt(x * dim.marble[0], 10) + 'px',
+      'top': parseInt(h - dim.marble[1] - (y * dim.marble[1]), 10) + 'px'
     });
   });
   $marbles = $grid.find('div'); //$($grid[0].getElementsByTagName('div'));
-  //$marbles.touchClick(selectMarble);
+  $marbles.touchClick(selectMarble);
 
-  var down = null;
-  $marbles.on('touchstart', function () {
-    var m = Marbles.get(this.x, this.y);
-    m.tag();
-    console.log('tagging', { x: this.x, y: this.y, gameActive: gameActive });
-  }).on('touchmove', function () {
-    if (!Marbles.get(this.x, this.y).tagged) {
-      Marbles.untag();
-    }
-  }).on('touchend', function () {
-    down = null;
-    Marbles.clear();
-  });
+  // var down = null;
+  // $marbles.on('touchstart', function () {
+  //   var m = Marbles.get(this.x, this.y);
+  //   m.tag();
+  //   // console.log('tagging', { x: this.x, y: this.y, gameActive: gameActive });
+  // }).on('touchmove', function () {
+  //   if (!Marbles.get(this.x, this.y).tagged) {
+  //     Marbles.untag();
+  //   }
+  // }).on('touchend', function () {
+  //   down = null;
+  //   Marbles.clear();
+  // });
 
   //$marbles.touch(selectMarble);
   //$marbles.on('touchin', function () {
@@ -138,78 +251,12 @@ function initDraw(noTimer) {
   gameActive = true;
   $score.html('Score: ' + commafy(Marbles.getScore()));
   
-  if (noTimer != true) startTimer();
+  if (noTimer !== true) {
+    startTimer();
+  }
   
   return false;
 }
-
-function newTimer(width) {
-  var countdown = $('#timer')[0], newCountdown = document.createElement('div');
-  newCountdown.setAttribute('id', 'timer');
-  if (width) newCountdown.style.width = width;
-  newCountdown.className = 'toolbar';
-  
-  document.body.appendChild(newCountdown);
-  countdown.parentNode.removeChild(countdown);  
-}
-
-function startTimer() {
-  // reset
-  newTimer();  
-  $('#timer').tween({ width : 0 + 'px' }, { duration: 10 * 1000, easing: 'linear', callback: function () {
-    Marbles.bonusFinished();
-  }});
-}
-
-function stopTimer() {
-  newTimer(getComputedStyle(document.getElementById('timer'), null).width);
-}
-
-function prevent(event) {
-  event && event.preventDefault && event.preventDefault();
-  event && event.stopPropagation && event.stopPropagation();  
-}
-
-function selectMarble(event) {
-  prevent(event);
-  
-  if (!gameActive) return;
-
-  var t = this, //event.target, 
-      m = Marbles.get(t.x, t.y);
-
-  if (m) { 
-    m.tag();
-    if (Marbles.activeTags) {
-      Marbles.clear();
-    }
-  }
-
-  $score.html('Score: ' + commafy(Marbles.getScore()));
-}
-
-// broken in PhoneGap 0.8.3
-// var wide = document.createElement('meta');
-// wide.setAttribute('id','meta');
-// wide.setAttribute('name', 'viewport');
-// wide.setAttribute('content', 'width=720; user-scalable=no');
-// 
-// var narrow = document.createElement('meta');
-// narrow.setAttribute('id','meta');
-// narrow.setAttribute('name', 'viewport');
-// narrow.setAttribute('content', 'width=320; user-scalable=no');
-
-$(document).on('orientationchange', function(e) { 
-  // alert("Orientation changed to " + window.orientation); 
-  // var meta = document.getElementById('meta');
-  // meta.parentNode.removeChild(meta);
-  // document.getElementsByTagName('head')[0].appendChild(window.orientation === 0 ? narrow : wide);
-  setTimeout(function () {
-    window.scrollTo(0, 1);
-  }, 10);
-  
-  // <meta name="viewport" content="width=720; user-scalable=no" />
-}, false);
 
 // play again
 function newGame(event) {
@@ -228,7 +275,7 @@ function retryboard(e) {
 
 function levelUpNewGame(event) {
   Marbles.levelUp();
-  prevent(event)
+  prevent(event);
   clearInterval(levelUpTimer);
   $body.removeClass('levelup');
   $('#newGameCountdown')[0].innerHTML = '3';
@@ -238,7 +285,9 @@ function levelUpNewGame(event) {
 function removeSave(event) {
   document.body.className = '';
   startTimer();
-  event && event.preventDefault && event.preventDefault();
+  if (event && event.preventDefault) {
+    event.preventDefault();
+  }
 }
 
 function saveHighscore() {
@@ -250,13 +299,13 @@ function saveHighscore() {
   
   try {
     // annoying that Safari occassionally breaks here for no reason
-    localStorage.setItem('highscores', JSON.stringify(highscores));    
+    localStorage.setItem('highscores', JSON.stringify(highscores));
   } catch (e) {}
   
   if (newHighscore || highscores[highscores.length-1].score < score) {
     // genius: http://twitter.com/slevithan/status/11418431475
     if (highscores[0].score <= score) {
-      $('#hsn')[0].innerHTML = commafy(score);      
+      $('#hsn')[0].innerHTML = commafy(score);
     }
     
     var msg = "I scored " + commafy(score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
@@ -270,16 +319,12 @@ function saveHighscore() {
   }
 }
 
-function commafy(n) {
-  return n.toString().replace(/(^|[^\w.])(\d{4,})/g, function($0,$1,$2) {
-    return $1 + $2.replace(/\d(?=(?:\d\d\d)+(?!\d))/g, "$&,");
-  });
-}
-
 function showHighscores(event) {
   prevent(event);
   var el = highscoreTable;
-  if (highscores.length) el.innerHTML = '';
+  if (highscores.length) {
+    el.innerHTML = '';
+  }
   highscores.forEach(function (score, i) {
     el.innerHTML += '<tr><td>' + commafy(score.score) + '</td><td>' + time.relative(score.date) +'</td><td>' + (score.seed ? '<div class="playagain button" data-seed="' + score.seed + '" title="' + score.seed + '">Play</div>' : '&nbsp;') + '</td></tr>';
   });
@@ -319,101 +364,76 @@ function openURL(url, def) {
   try {
     iframe.contentWindow.location = url;
   } catch (e) {
-    alert('err');
+    window.alert('err');
     window.location = def;
   }
 }
 
-function serverLog(message) {
-  var client = new XMLHttpRequest();
-  client.open("POST", "http://marbles2.com/log.php");
-  client.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  client.send('data='+encodeURIComponent(message));
-}
+// broken in PhoneGap 0.8.3
+// var wide = document.createElement('meta');
+// wide.setAttribute('id','meta');
+// wide.setAttribute('name', 'viewport');
+// wide.setAttribute('content', 'width=720; user-scalable=no');
+//
+// var narrow = document.createElement('meta');
+// narrow.setAttribute('id','meta');
+// narrow.setAttribute('name', 'viewport');
+// narrow.setAttribute('content', 'width=320; user-scalable=no');
 
-var time = function () {
-  var monthDict = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return {
-    time: function (date) {
-      var hour = date.getHours(),
-          min = date.getMinutes() + "",
-          ampm = 'am';
+
+var s = document.createElement('style');
+document.body.appendChild(s);
+s.innerText = '#grid > div { height: ' + (~~(baseWidth/7)-5) + 'px; width: ' + (~~(baseWidth/7)-5) + 'px; } #grid { height: ' + baseWidth + 'px; left: ' + Math.ceil((bodyDims.width - (~~(baseWidth/n))*7)/2) + 'px; ; } html,body { height: ' + bodyDims.height + 'px;}';
+try {
+  s.innerHTML = s.innerText;
+} catch (e) {} // fails only on the WebkitMobile **hardware** environment
+
+Marbles.drawMarble = function (x, y, tagged, type) {
+  var i = x + (Marbles.width * y);
+  $marbles[x + (Marbles.width * y)].className = colours[type] || 'empty';
+  if (tagged) {
+    $marbles[i].className += ' active';
+  }
+};
+
+Marbles.gameover(function () {
+  var movesLeft = this.movesLeft(), msg = '';
   
-      if (hour == 0) {
-        hour = 12;
-      } else if (hour == 12) {
-        ampm = 'pm';
-      } else if (hour > 12) {
-        hour -= 12;
-        ampm = 'pm';
-      }
+  stopTimer();
   
-      if (min.length == 1) {
-        min = '0' + min;
-      }
-  
-      return hour + ampm;
-    },
-    date: function (date) {
-      var ds = date.toDateString().split(/ /),
-          mon = monthDict[date.getMonth()],
-          day = date.getDate()+'',
-          dayi = ~~(day),
-          year = date.getFullYear(),
-          thisyear = (new Date()).getFullYear(),
-          th = 'th';
-
-      // anti-'th' - but don't do the 11th, 12th or 13th
-      if ((dayi % 10) == 1 && dayi != 11) {
-        th = 'st';
-      } else if ((dayi % 10) == 2 && day.substr(0, 1) != '1') {
-        th = 'nd';
-      } else if ((dayi % 10) == 3 && day.substr(0, 1) != '1') {
-        th = 'rd';
-      }
-
-      if (day.substr(0, 1) == '0') {
-        day = day.substr(1);
-      }
-
-      return mon + ' ' + day + th + (thisyear != year ? ', ' + year : '');
-    },
-    datetime: function (t) {
-      var date = new Date(t);
-
-      return this.time(date) + ' ' + this.date(date);
-    },
-    relative: function (t) {
-      var date = new Date(t),
-          relative_to = (arguments.length > 1) ? arguments[1] : new Date(),
-          delta = ~~((relative_to.getTime() - t) / 1000),
-          r = '';
-
-      // delta = delta + (relative_to.getTimezoneOffset() * 60);
-
-      if (delta < 60) {
-        r = 'just now';
-      } else if (delta < 120) {
-        r = 'a minute ago';
-      } else if (delta < (45*60)) {
-        r = (~~(delta / 60)).toString() + ' mins ago';
-      } else if (delta < (2*90*60)) { // 2* because sometimes read 1 hours ago
-        r = (~~(delta / 60)).toString() + ' mins ago';
-        // r = '1 hour ago';
-      } else if (delta < (24*60*60)) {
-        r = (~~(delta / 3600)).toString() + ' hours ago';
+  if (movesLeft === 0 && this.marblesLeft() !== 0) {
+    gameActive = false;
+    msg = saveHighscore();
+    $('#msg').html(msg);
+    $body.addClass('gameover');
+  } else if (movesLeft === 0 && this.marblesLeft() === 0) {
+    // next level
+    $body.addClass('levelup');
+    levelUpTimer = setInterval(function () {
+      var countdown = $('#newGameCountdown')[0];
+      if (countdown.innerHTML === 1) {
+        clearInterval(levelUpTimer);
+        levelUpNewGame();
       } else {
-        if (delta < (48*60*60)) {
-          r = this.time(date) + ' yesterday';
-        } else {
-          r = this.date(date); //  this.time(date) + ' ' + 
-        }
+        countdown.innerHTML = countdown.innerHTML - 1;
       }
+    }, 1000);
+  }
+});
 
-      return r;
-    }    
-  };
-}();
+
+
+$(document).on('orientationchange', function(e) {
+  // alert("Orientation changed to " + window.orientation);
+  // var meta = document.getElementById('meta');
+  // meta.parentNode.removeChild(meta);
+  // document.getElementsByTagName('head')[0].appendChild(window.orientation === 0 ? narrow : wide);
+  setTimeout(function () {
+    window.scrollTo(0, 1);
+  }, 10);
+  
+  // <meta name="viewport" content="width=720; user-scalable=no" />
+}, false);
 
 $('#hsn').html(highscores.length ? commafy(highscores[0].score) : '');
 
@@ -438,7 +458,7 @@ $('#highscore').touch(showHighscores);
 $body.on('touchmove', prevent);
 
 
-// bit of magic: if the browser supports a custom url scheme, and the 
+// bit of magic: if the browser supports a custom url scheme, and the
 // custom scheme is supported, it'll redirect the browser window entirely.
 // if it's not, it won't redirect, and the user will stil be able to play
 // the game
@@ -457,7 +477,7 @@ window.location.search.replace(/\bseed=([^&=]*)\b/, function (m, seed) {
 // horrible, but adds a tiny bit of nice ux
 if (!nativeapp && /iphone/i.test(navigator.userAgent) && !navigator.standalone && !playedBefore ) {
   try {
-    localStorage.setItem('playedBefore', true);    
+    localStorage.setItem('playedBefore', true);
   } catch (e) {}
   document.body.className = 'saveToSpring';
   $(document).oneTouchClick(removeSave);
@@ -479,24 +499,14 @@ $highscoresWrapper.touch(function (event) {
   $body.removeClass('highscores');
 });
 
-if (!PhoneGap.available) {
+if (window.PhoneGap && !window.PhoneGap.available) {
   $(document).fire('deviceready');
   // scroll the url bar out of view
   setTimeout(function () {
-    console.log('scroll jumped');
+    // console.log('scroll jumped');
       
     window.scrollTo(0, 1);
   }, 10);
-} 
+}
 
-console.log('app is ready', Marbles);
-
-
-
-
-
-
-
-
-
-
+// console.log('app is ready', Marbles);
