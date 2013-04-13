@@ -411,7 +411,7 @@ Marbles.gameover(function () {
     $body.addClass('levelup');
     levelUpTimer = setInterval(function () {
       var countdown = $('#newGameCountdown')[0];
-      if (countdown.innerHTML === 1) {
+      if (countdown.innerHTML == 1) {
         clearInterval(levelUpTimer);
         levelUpNewGame();
       } else {
