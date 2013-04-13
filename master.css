@@ -290,6 +290,8 @@ a {
 
 #status span {
   margin: 0 7px;
+  position: relative;
+  z-index: 999;
 }
 
 /*
@@ -457,7 +459,6 @@ a {
   -webkit-border-image: url(images/button.png) 0 5 0 5 stretch stretch;
   -moz-border-image: url(images/button.png) 0 5 0 5 stretch stretch;
   -o-border-image: url(images/button.png) 0 5 0 5 stretch stretch;
-  border-image: url(images/button.png) 0 5 0 5 stretch stretch;
   color: #fff;
   font-family: 'Helvetica Neue', Helvetica;
   font-size: 12px;
@@ -474,7 +475,6 @@ a {
   -webkit-border-image: url(images/buttonPressed.png) 0 5 0 5 stretch stretch;  
   -moz-border-image: url(images/buttonPressed.png) 0 5 0 5 stretch stretch;  
   -o-border-image: url(images/buttonPressed.png) 0 5 0 5 stretch stretch;  
-  border-image: url(images/buttonPressed.png) 0 5 0 5 stretch stretch;  
 }
 
 .button img {

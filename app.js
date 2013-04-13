@@ -154,7 +154,7 @@ function newTimer(width) {
   }
   newCountdown.className = 'toolbar';
   
-  document.body.appendChild(newCountdown);
+  $('#status')[0].appendChild(newCountdown);
   countdown.parentNode.removeChild(countdown);
 }
 
