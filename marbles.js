@@ -55,7 +55,7 @@ Marbles = (function (undefined) {
       random: random,
       seed: function (seed) {
         if (seed === true) {
-          RandSeed = (new Date().getTime / 1000 * this.random()) | 0;
+          RandSeed = (new Date().getTime() / 1000 * this.random()) | 0;
         } else if (seed !== undefined) {
           RandSeed = seed;
         }
