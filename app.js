@@ -483,20 +483,6 @@ if (!PhoneGap.available) {
   $(document).fire('deviceready');
   // scroll the url bar out of view
   setTimeout(function () {
-    console.log('scroll jumped');
-      
     window.scrollTo(0, 1);
   }, 10);
 } 
-
-console.log('app is ready', Marbles);
-
-
-
-
-
-
-
-
-
-
