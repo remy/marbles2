@@ -1,31 +1,36 @@
-if (!window.JSON) JSON = {
-  parse: function (s) {
-    var d;
-    eval('d = ' + s);
-    return d;
-  },
-  stringify: function (o) {
-    var string = '', parts = [], type = o.toString();
-    if (type == '[object Object]') {
-      for (var k in o) {
-        parts.push('"' + k + '"' + ':' + JSON.stringify(o[k]));
+if (!window.JSON) {
+  window.JSON = {
+    parse: function (s) {
+      /*jshint evil:true*/
+      var d;
+      eval('d = ' + s);
+      return d;
+    },
+    stringify: function (o) {
+      var string = '', parts = [], type = o.toString(), k;
+      if (type === '[object Object]') {
+        for (k in o) {
+          parts.push('"' + k + '"' + ':' + JSON.stringify(o[k]));
+        }
+        string = '{' + parts.join(',') + '}';
+      } else if (o instanceof Array) {
+        for (k = 0; k < o.length; k++) {
+          parts.push(JSON.stringify(o[k]));
+        }
+        string = '[' + parts.join(',') + ']';
+      } else if (typeof o === 'string') {
+        string = '"' + o.replace(/[\n"]/, function (m) { return { '\n' : '\\n', '"' : '\\"'}; }) + '"';
+      } else {
+        string = o.toString();
       }
-      string = '{' + parts.join(',') + '}';
-    } else if (o instanceof Array) {
-      for (k = 0; k < o.length; k++) {
-        parts.push(JSON.stringify(o[k]));
-      }
-      string = '[' + parts.join(',') + ']';
-    } else if (typeof o == 'string') {
-      string = '"' + o.replace(/[\n"]/, function (m) { return { '\n' : '\\n', '"' : '\\"'}; }) + '"';
-    } else {
-      string = o.toString();
-    } 
-    return string;
-  }
-};
+      return string;
+    }
+  };
+}
 
-if (!window.localStorage || !window.sessionStorage) (function () {
+if (!window.localStorage || !window.sessionStorage) {
+
+(function () {
 
 var Storage = function (type) {
   function createCookie(name, value, days) {
@@ -48,11 +53,11 @@ var Storage = function (type) {
 
     for (i=0; i < ca.length; i++) {
       c = ca[i];
-      while (c.charAt(0)==' ') {
+      while (c.charAt(0)===' ') {
         c = c.substring(1,c.length);
       }
 
-      if (c.indexOf(nameEQ) == 0) {
+      if (c.indexOf(nameEQ) === 0) {
         return c.substring(nameEQ.length,c.length);
       }
     }
@@ -61,7 +66,7 @@ var Storage = function (type) {
   
   function setData(data) {
     data = JSON.stringify(data);
-    if (type == 'session') {
+    if (type === 'session') {
       window.top.name = data;
     } else {
       createCookie('localStorage', data, 365);
@@ -69,7 +74,7 @@ var Storage = function (type) {
   }
   
   function clearData() {
-    if (type == 'session') {
+    if (type === 'session') {
       window.top.name = '';
     } else {
       createCookie('localStorage', '', 365);
@@ -77,7 +82,7 @@ var Storage = function (type) {
   }
   
   function getData() {
-    var data = type == 'session' ? window.top.name : readCookie('localStorage');
+    var data = type === 'session' ? window.top.name : readCookie('localStorage');
     return data ? JSON.parse(data) : {};
   }
 
@@ -97,8 +102,11 @@ var Storage = function (type) {
       // not perfect, but works
       var ctr = 0;
       for (var k in data) {
-        if (ctr == i) return k;
-        else ctr++;
+        if (ctr === i) {
+          return k;
+        } else {
+          ctr++;
+        }
       }
       return null;
     },
@@ -113,7 +121,9 @@ var Storage = function (type) {
   };
 };
 
-if (!window.localStorage) window.localStorage = new Storage('local');
-if (!window.sessionStorage) window.sessionStorage = new Storage('session');
+if (!window.localStorage) { window.localStorage = new Storage('local'); }
+if (!window.sessionStorage) { window.sessionStorage = new Storage('session'); }
 
 })();
+
+}

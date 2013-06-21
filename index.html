@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html manifest="app.appcache">
 <head>
 <meta id="meta" name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
 <meta charset=utf-8 />
@@ -28,11 +28,11 @@
   <div class="replaybutton newgame">New</div>
 </div>
 <div id="status" class="toolbar">
+<div id="timer" class="toolbar"></div>
   <span id="score">Score: 0</span>
   <span id="potential">Level: 0</span>
 </div>
 <div id="saveToSpring"></div>
-<div id="timer" class="toolbar"></div>
 <div id="highscores">
   <h1>High Scores</h1>
   <div>
@@ -63,6 +63,7 @@
 <script src="/storage.js"></script>
 <script src="/marbles.js"></script>
 <script src="/app.js"></script>
+<!-- <script src="/dist/Marbles2-0.1.2.min.js"></script> -->
 </body>
 </html>
 
