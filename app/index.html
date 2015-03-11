@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html manifest="app.appcache">
+<head>
+<meta id="meta" name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
+<meta charset=utf-8 />
+<title>Marbles²</title>
+<link href='marbles-squared.png' rel='apple-touch-icon' />
+<link href='marbles-squared.png' rel='icon' type="image/png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link href='Default.png' rel='apple-touch-startup-image' />
+<link rel="stylesheet" href="master.css" type="text/css" />
+</head>
+<body class="loading">
+<div id="loading"></div>
+<div class="toolbar" id="toolbar">
+  <div class="button" id="highscore"><img src="images/highscore.png" /><span id="hsn"></span></div>
+  <div class="button newgame" id="start">New Game</div>
+</div>
+<div selected="true" id="grid"></div>
+<div id="levelup">
+  <p>Congratulations!</p>
+  <p>Starting new board in<span id="newGameCountdown">3</span></p>
+</div>
+<div id="replay">
+  <div><p id="msg">Yay! High score!</p><a href="#" id="tweet">tweet</a></div>
+  <div class="replaybutton" id="retryboard">Retry</div>
+  <div class="replaybutton newgame">New</div>
+</div>
+<div id="status" class="toolbar">
+<div id="timer" class="toolbar"></div>
+  <span id="score">Score: 0</span>
+  <span id="potential">Level: 0</span>
+</div>
+<div id="saveToSpring"></div>
+<div id="highscores">
+  <h1>High Scores</h1>
+  <div>
+    <table>
+      <thead>
+        <tr>
+          <th class="position">#</th>
+          <th class="score">score</th>
+          <th class="when">when</th>
+        </tr>
+      </thead>
+      <tbody id="highscoreTable">
+        <tr>
+          <td colspan="3" style="text-align: left; padding: 0 20px; font-size: 20px; line-height: 20px;">
+            <p>Welcome Marbles<sup>2</sup> player! You've hit the highscores leader board early I'm afraid.</p>
+            <p>There's yet to be any scores saved yet. Have a play, and you'll soon fill up this leaderboard.</p>
+            <p>You can also share your scores through twitter using a game "seed", but don't worry about that, go have a play and enjoy!</p>
+            <p>&mdash; @rem</p>
+          </td>
+        </tr>
+      </tbody></table>
+  </div>
+</div>
+<script src="/xui-core-1.0.0.js"></script>
+<script src="/xui-anim.js"></script>
+<script src="/xui-plugins.js"></script>
+<script src="/phonegap.js"></script>
+<script src="/storage.js"></script>
+<script src="/marbles.js"></script>
+<script src="/app.js"></script>
+<!-- <script src="/dist/Marbles2-0.1.2.min.js"></script> -->
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,540 @@
+* {
+  -webkit-touch-callout: none; /* prevent callout to copy image, etc when tap to hold */
+  -webkit-text-size-adjust: none; /* prevent webkit from resizing text to fit */
+/* make transparent link selection, adjust last value opacity 0 to 1.0 */
+  -webkit-tap-highlight-color: rgba(0,0,0,1.0); 
+  -webkit-user-select: none; /* prevent copy paste, to allow, change 'none' to 'text' */
+}
+
+#grid {
+  -webkit-tap-highlight-color: rgba(0,0,0,0); 
+}
+
+html, body {
+  height: 100%;
+  min-height: 420px;
+}
+
+body {
+  font-family: "helvetica neue", arial, helvetica;
+  overflow: hidden;
+  background:#000 none repeat scroll 0 0;
+  color: #fff;
+  font-family:Helvetica;
+  font-size:72%;
+  line-height:1.5em;
+  position: relative;
+/*  max-height: 460px;*/
+/*  min-height: 416px;*/
+  margin: 0 auto;
+  padding: 0;
+/*  width: 314px;*/
+/*  width: 320px;*/
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#383838), to(#0A0A0A));
+  border-top:1px solid #393939;
+}
+
+/* marbles themes */
+#grid { 
+/*  border-left: 3px solid #000;
+  border-right: 3px solid #000;*/
+  z-index: 10;
+  border-top: 1px solid #404040;
+/*  width: 314px;*/
+/*  height: 314px;*/
+/*  height: 320px;*/
+  position: relative; 
+  margin: 0 auto;
+  -webkit-transition: opacity linear 100ms;
+  -moz-transition: opacity linear 100ms;
+  -o-transition: opacity linear 100ms;
+  transition: opacity linear 100ms;
+}
+
+#control {
+  background-color: #fff;
+/*  width: 100%;*/
+  padding: 10px 0;
+}
+
+#control * { 
+  display: inline;
+}
+
+.hidden { 
+  display: block; 
+}
+
+a {
+  color: #fff;
+}
+
+/* a marble */
+#grid > div { 
+  cursor: pointer;
+  position: absolute; 
+  background-color: transparent;
+  height: 40px;
+  width: 40px;
+}
+
+#grid > .one {
+  background: #CA2275;
+  background: -webkit-gradient(radial, 50% 0%, 0, 25% 0%, 50, color-stop(0, #CA2275), color-stop(1, #A60858));
+  border: 2px solid #A60867;
+}
+
+#grid > .two {
+  background: #43BDF7;
+  background: -webkit-gradient(radial, 50% 0%, 0, 25% 0%, 50, color-stop(0, #43BDF7), color-stop(1, #4398F7));
+  border: 2px solid #43BDF7;
+}
+
+#grid > .three {
+  background: #FADC3D;
+  background: -webkit-gradient(radial, 50% 0%, 0, 0% 0%, 90, color-stop(0, #FFFF3D), color-stop(1, #FAAE3D));
+  border: 2px solid #FCCF08;
+}
+
+#grid > .four {
+  background: #8DDE39;
+  background: -webkit-gradient(radial, 50% 0%, 0, 0% 0%, 40, color-stop(0, #8DDE39), color-stop(1, #8DBF39));
+  border: 2px solid #8DDE39;
+}
+
+#grid > .empty {
+  cursor: auto;
+}
+
+#grid > .active,
+#grid > .selected {
+  opacity: 0.5;
+}
+
+.toolbar {
+  position: relative;
+  z-index: 10;
+  height: 44px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,.7);
+  font-size: 24px;
+  line-height: 44px;
+  font-weight: bold;
+/*  padding: 4px;*/
+  border-bottom: 1px solid #242424;
+}
+
+.status {
+  position: absolute;
+  bottom: 0;
+}
+
+#highscore,
+/*#start,*/
+#potential {
+  float: right;
+  text-decoration: none;
+}
+
+#score,
+#highscore {
+  float: left;
+}
+
+#replay, #levelup {
+  z-index: 10;
+  display: none;
+  position: absolute;
+  top: 20%;
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+  -webkit-transform: opacity linear 100ms;
+  -o-transform: opacity linear 100ms;
+  transform: opacity linear 100ms;
+  font-size: 28px;
+}
+
+#levelup {
+  cursor: pointer;
+  border: 1px inset #505050;
+  background: #171717;
+  -webkit-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
+  -moz-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
+  -o-box-shadow: 0 0 5px rgba(255, 255, 255, .05);
+  box-shadow: 0 0 5px rgba(255, 255, 255, .05);
+  
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  margin: 0 auto;
+  font-size: 18px;
+  margin: 0 10%;
+  width: 80%;
+  padding: 20px 0;
+}
+
+#levelup p {
+  margin: 10px;
+}
+
+#newGameCountdown {
+  position: absolute;
+  margin-top: -5px;
+  margin-left: 5px;
+  font-size: 28px;
+}
+
+#replay {
+  opacity: 0;
+}
+
+.gameover #replay {
+  display: block;
+  opacity: 1;
+}
+
+.levelup #levelup {
+  display: block;
+  opacity: 1;
+}
+
+.gameover #grid {
+  opacity: 0.3;
+}
+
+#replay .replaybutton {
+  text-decoration: none;
+  padding: 8px 12px;
+  font-size: 16px;
+  line-height: 18px;
+  border: 3px solid #fff;
+  -webkit-box-shadow: 0 0 4px rgba(255,255,255,0.8);
+  -moz-box-shadow: 0 0 4px rgba(255,255,255,0.8);
+  box-shadow: 0 0 4px rgba(255,255,255,0.8);
+  text-shadow: 0 0 4px rgba(255,255,255,0.3);
+
+  background: #242424;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, rgba(0,0,0,0)), color-stop(0.5, rgba(255,255,255,.05)), color-stop(0.51, rgba(0,0,0,0)), color-stop(1, rgba(0,0,0,0)));
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  border-radius: 20px;
+  margin-right: 10px;
+  width: 80px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+#replay .replaybutton:last-child {
+  margin-right: 0px;
+}
+
+#msg {
+  display: inline;
+  font-size: 28px;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(255,255,255,.2);
+  font-weight: bold;
+  line-height: 44px;
+}
+
+#replay div:first-child {
+  margin-bottom: 30px;
+}
+
+#tweet {
+  display: none;
+  text-indent: -999px;
+  overflow: hidden;
+  vertical-align: top;
+  height: 44px;
+  width: 44px;
+  background: url(images/t_logo-c.png) center no-repeat;
+  cursor: pointer;
+}
+
+#replay.highscore #tweet {
+  display: inline-block;
+}
+
+#timer {
+  overflow: hidden;
+  z-index: 9; /* 9 - sits below everything */
+  position: absolute;
+  bottom: 2px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  background: #7D0000;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, #f00), color-stop(1, #7D0000));
+  width: 100%;
+  text-shadow: -1px -1px 0px #270000;
+  color: rgba(255, 0, 0, 0.2);
+}
+
+/* because the 44px rhythm breaks down when it's in a browser and the height is actually 356px */
+@media screen and (height: 356px) {
+  #timer { height: 56px; }
+}
+
+#timer > * {
+  position: absolute;
+  left: 120px;
+  line-height: 48px;
+}
+
+#status {
+/*  position: absolute;*/
+/*  bottom: 0;*/
+  border: 0;
+}
+
+#status span {
+  margin: 0 7px;
+  position: relative;
+  z-index: 999;
+}
+
+/*
+#grid {
+  display: block;
+  z-index: 20;
+  top: 0;
+  position: absolute;
+}*/
+
+#saveToSpring {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  z-index: 12;
+  background: url(addtohome.png) no-repeat bottom 48%;
+  display: none;
+}
+
+.saveToSpring #saveToSpring {
+  display: block;
+}
+
+/* Portrait */
+/*@media screen and (max-width: 320px) {
+  body { -webkit-transform: rotate(0deg); }
+}
+*/ 
+/* Landscape */
+/*@media screen and (min-width: 321px) {
+  body { -webkit-transform: rotate(90deg); }
+}
+*/
+
+#highscores {
+/*  display: none;*/
+  opacity: 0;
+  background: #242424;
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#383838), to(#0A0A0A));
+
+  height: 0;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  -webkit-transition: all 100ms ease-out;
+  -moz-transition: all 100ms ease-out;
+  -o-transition: all 100ms ease-out;
+  transition: all 100ms ease-out;
+}
+
+.highscores #highscores {
+  opacity: 1;
+  height: 100%;
+}
+
+#highscores > div {
+  background: #fff;
+  color: #000;
+  height: 100%;  
+  margin: 0 10px;
+}
+
+#highscores h1 {
+  border: 10px solid #fff;
+  line-height: 48px;
+  font-size: 28px;
+  margin: 10px;
+/*  font-family: georgia;*/
+/*  font-style: italic;*/
+  margin-bottom: 0;
+  -webkit-border-top-right-radius: 20px;
+  -webkit-border-top-left-radius: 20px;
+  -moz-border-radius-topright: 20px;
+  -moz-border-radius-topleft: 20px;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  border-bottom: 0;
+  text-align: center;
+/*  background: #1B8500;*/
+  background: #242424;
+  background: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#383838), to(#0A0A0A));
+  
+  text-shadow: 1px 1px 0px #000;
+  color: #fff;
+}
+
+#highscores table {
+  border-collapse: collapse; 
+  width: 100%;
+  border: 10px solid #fff;
+  border-top: 0;
+}
+
+#highscores .position {
+  width: 10%;
+}
+
+#highscores .score {
+  width: 30%;
+}
+
+#highscores .when {
+  width: 70%;
+}
+
+#highscores td, #highscores th {
+  padding: 5px 10px;
+}
+
+#highscores td, #highscores th {
+  font-size: 18px;
+  text-align: left;
+/*  font-family: georgia;*/
+}
+
+#highscores tbody tr:nth-child(even) {
+/*  background: #E4F6D8;*/
+  background: #efefef;
+}
+
+#highscores thead {
+	display: none;
+}
+
+#highscores tbody td {
+	text-align: right;
+}
+
+#highscores tbody td:nth-child(3) {
+  text-align: left;
+}
+
+#toolbar {
+  background: rgba(0, 0, 0, .1);
+}
+
+#start {
+  position: absolute;
+  right: 5px;
+  top: 7px;
+}
+
+#highscore {
+  left: 5px;
+  top: 7px;
+  position: absolute;
+}
+
+.button {
+  border-width: 0 5px;
+  padding: 8px 5px 0 5px;
+  display: block;
+  height: 22px;
+  line-height: 16px;
+  max-width: 496px;
+  border: 1px solid #333;
+  border-right-width: 5px;
+  border-left-width: 5px;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0); 
+  -webkit-border-image: url(images/button.png) 0 5 0 5 stretch stretch;
+  -moz-border-image: url(images/button.png) 0 5 0 5 stretch stretch;
+  -o-border-image: url(images/button.png) 0 5 0 5 stretch stretch;
+  color: #fff;
+  font-family: 'Helvetica Neue', Helvetica;
+  font-size: 12px;
+  font-weight: bold;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-shadow: rgba(0, 0, 0, 0.597656) 0px -1px 0px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.button.active {
+  -webkit-border-image: url(images/buttonPressed.png) 0 5 0 5 stretch stretch;  
+  -moz-border-image: url(images/buttonPressed.png) 0 5 0 5 stretch stretch;  
+  -o-border-image: url(images/buttonPressed.png) 0 5 0 5 stretch stretch;  
+}
+
+.button img {
+  vertical-align: top;
+}
+
+#hsn {
+  margin-left: 5px;
+}
+
+#hsn:empty {
+  margin-left: 0;
+}
+
+#loading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: #000 url(Default.png) no-repeat center;
+  z-index: 99;
+  display: none;
+}
+
+.loading #loading {
+  display: block;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
