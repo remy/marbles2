@@ -46,7 +46,7 @@ var time = (function () {
       var hour = date.getHours(),
           min = date.getMinutes() + "",
           ampm = 'am';
-  
+
       if (hour === 0) {
         hour = 12;
       } else if (hour === 12) {
@@ -55,11 +55,11 @@ var time = (function () {
         hour -= 12;
         ampm = 'pm';
       }
-  
+
       if (min.length === 1) {
         min = '0' + min;
       }
-  
+
       return hour + ampm;
     },
     date: function (date) {
@@ -153,14 +153,14 @@ function newTimer(width) {
     newCountdown.style.width = width;
   }
   newCountdown.className = 'toolbar';
-  
+
   $('#status')[0].appendChild(newCountdown);
   countdown.parentNode.removeChild(countdown);
 }
 
 function selectMarble(event) {
   prevent(event);
-  
+
   if (!gameActive) {
     return;
   }
@@ -197,7 +197,7 @@ function initDraw(noTimer) {
   countdown.innerHTML = '3';
   $potential.html('Level: ' + Marbles.level);
   Marbles.init(dim.grid[0], dim.grid[1], dim.types);
-  
+
   // var divs = $grid[0].getElementsByTagName('div');
   // [].forEach.call(divs, function (div) {
   //   div.parentNode.removeChild(div);
@@ -205,9 +205,9 @@ function initDraw(noTimer) {
   $grid.find('div').each(function () {
     this.parentNode.removeChild(this);
   });
-  
+
   $body.removeClass('gameover');
-  
+
   // rebuild
   var h = parseInt(Marbles.height * dim.marble[1], 10), w = parseInt(Marbles.width * dim.marble[0], 10);
   $grid.css({ 'width': w, 'height': h });
@@ -250,11 +250,11 @@ function initDraw(noTimer) {
   //});
   gameActive = true;
   $score.html('Score: ' + commafy(Marbles.getScore()));
-  
+
   if (noTimer !== true) {
     startTimer();
   }
-  
+
   return false;
 }
 
@@ -296,18 +296,18 @@ function saveHighscore() {
   highscores = highscores.sort(function (a, b) {
     return b.score > a.score ? 1 : -1;
   }).slice(0, 9); // limit to 10;
-  
+
   try {
     // annoying that Safari occassionally breaks here for no reason
     localStorage.setItem('highscores', JSON.stringify(highscores));
   } catch (e) {}
-  
+
   if (newHighscore || highscores[highscores.length-1].score < score) {
     // genius: http://twitter.com/slevithan/status/11418431475
     if (highscores[0].score <= score) {
       $('#hsn')[0].innerHTML = commafy(score);
     }
-    
+
     var msg = "I scored " + commafy(score) + " playing this Marbles² board: http://marbles2.com/app/?seed=" + Marbles.seed();
     $tweet[0].href = 'http://twitter.com/?status=' + encodeURIComponent(msg);
     $replay.addClass('highscore');
@@ -328,7 +328,7 @@ function showHighscores(event) {
   highscores.forEach(function (score, i) {
     el.innerHTML += '<tr><td>' + commafy(score.score) + '</td><td>' + time.relative(score.date) +'</td><td>' + (score.seed ? '<div class="playagain button" data-seed="' + score.seed + '" title="' + score.seed + '">Play</div>' : '&nbsp;') + '</td></tr>';
   });
-  
+
   $highscoresWrapper.find('div.button').touch(function () {
     var seed = this.getAttribute('data-seed');
     if (seed) {
@@ -359,7 +359,7 @@ function openURL(url, def) {
     window.location = def;
     return;
   }
-  
+
   var sandbox = iframe.contentWindow;
   try {
     iframe.contentWindow.location = url;
@@ -398,9 +398,9 @@ Marbles.drawMarble = function (x, y, tagged, type) {
 
 Marbles.gameover(function () {
   var movesLeft = this.movesLeft(), msg = '';
-  
+
   stopTimer();
-  
+
   if (movesLeft === 0 && this.marblesLeft() !== 0) {
     gameActive = false;
     msg = saveHighscore();
@@ -431,7 +431,7 @@ $(document).on('orientationchange', function(e) {
   setTimeout(function () {
     window.scrollTo(0, 1);
   }, 10);
-  
+
   // <meta name="viewport" content="width=720; user-scalable=no" />
 }, false);
 
@@ -442,10 +442,10 @@ $('.newgame').touch(newGame);
 
 $('#tweet').touch(function (event) {
   var msg = this.search.replace(/\?status=/, '');
-    
+
   // this is nasty, but on the desktop, tweetie url scheme handler is different to mobile :(
   var tweetie = navigator.userAgent.indexOf('Mobile') === -1 ? 'tweetie:///' : 'tweetie:///post?message=';
-  
+
   openURL(tweetie + msg, this.href);
   event.preventDefault();
 });
@@ -468,7 +468,7 @@ window.location.search.replace(/\bseed=([^&=]*)\b/, function (m, seed) {
   iframe.onload = function () {
     document.body.removeChild(iframe);
   };
-  
+
   // this pops up an ugly window in Mobile WebKit - would be nice to surpress it
   iframe.contentWindow.location = 'marbles:///?seed=' + seed;
   Marbles.seed(seed); // handle the web based game using the seed
@@ -499,10 +499,10 @@ $highscoresWrapper.touch(function (event) {
   $body.removeClass('highscores');
 });
 
-if (window.PhoneGap && !window.PhoneGap.available) {
+// if (window.PhoneGap && !window.PhoneGap.available) {
   $(document).fire('deviceready');
   // scroll the url bar out of view
   setTimeout(function () {
     window.scrollTo(0, 1);
   }, 10);
-} 
+// }
