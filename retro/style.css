@@ -1,0 +1,93 @@
+/* @font-face {
+font-family: 'palm-os-bold';
+src: local('☺'), url('fonts/palm-os-bold.woff') format('woff');
+font-weight: normal;
+font-style: normal;
+}
+
+@font-face {
+font-family: 'palm-os-large';
+src: local('☺'), url('fonts/palm-os-large.woff') format('woff');
+font-weight: normal;
+font-style: normal;
+} */
+
+@font-face {
+  font-family: 'palm-os';
+  src: local('☺'), url('fonts/palm-os.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body,
+html {
+  font-family: 'palm-os';
+  font-size: 11px;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  background: #7b8b5c;
+  font-family: 'palm-os';
+}
+
+img {
+  display: none;
+  image-rendering: crisp-edges;
+}
+
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+  /* border: 0px solid black; */
+  margin: 0 auto;
+  width: 80vw;
+  height: 80vh;
+  object-fit: contain;
+}
+
+#grid {
+  width: auto;
+  background: #7b8b5c;
+  cursor: pointer;
+  /* display: none; */
+}
+
+#text {
+  position: absolute;
+  background: none;
+  top: 0;
+  /* background: red; */
+}
+
+pre {
+  /* margin-top: 42vh; */
+  font-size: 24px;
+  display: block;
+  /* z-index: -1; */
+  user-select: none !important;
+}
+
+[hidden] {
+  /* display: none; */
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  flex-direction: column;
+}
+
+#text {
+  pointer-events: none;
+  position: absolute;
+}
