@@ -30,6 +30,7 @@ html {
 * {
   background: #7b8b5c;
   font-family: 'palm-os';
+  -webkit-tap-highlight-color: transparent;
 }
 
 img {
