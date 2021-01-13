@@ -51,6 +51,7 @@ canvas {
 
 #grid {
   width: auto;
+  max-width: 100%;
   background: #7b8b5c;
   cursor: pointer;
   /* display: none; */
