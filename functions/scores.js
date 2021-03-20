@@ -198,6 +198,7 @@ class Game {
 }
 
 function toBytes(str) {
+  console.log(typeof str);
   const b = Buffer.from(str, 'base64');
   const res = Uint8Array.from(b);
 
@@ -267,6 +268,7 @@ exports.handler = async (event, context) => {
   // When the method is POST, the name will no longer be in the event’s
   // queryStringParameters – it’ll be in the event body encoded as a query string
   const params = querystring.parse(event.body);
+  console.log(JSON.stringify(event.body));
   const input = toBytes(params.data);
   const previous = toBytes(params.previous);
 
@@ -276,6 +278,7 @@ exports.handler = async (event, context) => {
   // then parse previous for high scores and insert to new position
   const view = new DataView(previous.buffer);
   let i = 0;
+  let applied = false;
   const scores = [];
   while (i < view.byteLength) {
     const name = new TextDecoder().decode(view.buffer.slice(i, i + 3));
@@ -292,6 +295,8 @@ exports.handler = async (event, context) => {
   }
 
   const res = encodeScores(scores.slice(0, 10));
+
+  console.log(Buffer.from(res).toString('base64'));
 
   return {
     statusCode: 200,
