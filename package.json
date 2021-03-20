@@ -1,0 +1,27 @@
+{
+  "name": "marbles2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/remy/marbles2.git"
+  },
+  "config": {
+    "alias": "marbles2.com"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/remy/marbles2/issues"
+  },
+  "homepage": "https://github.com/remy/marbles2#readme",
+  "dependencies": {
+    "st": "^1.1.0"
+  }
+}
