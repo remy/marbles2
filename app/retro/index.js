@@ -87,7 +87,7 @@ function mask({ x, y, i = null }) {
 
 function getCoords(event) {
   const x = ((event.offsetX / event.target.offsetHeight) * 10) | 0;
-  const y = ((event.offsetY / event.target.offsetHeight) * 10) | 0;
+  const y = ((event.offsetY / event.target.offsetWidth) * 10) | 0;
 
   return { x, y };
 }
