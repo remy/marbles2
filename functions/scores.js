@@ -2,6 +2,7 @@ const querystring = require('querystring');
 
 const EMPTY = 16;
 const length = 10;
+const MULTIPLIER = 1;
 
 class Game {
   grid = [];
@@ -129,7 +130,7 @@ class Game {
       this.init();
     }
 
-    return total * (5 + total);
+    return total * (MULTIPLIER + total);
 
     // return new Promise((resolve) => setTimeout(resolve, 200));
   }
@@ -198,17 +199,10 @@ class Game {
 }
 
 function toBytes(str) {
-  console.log(typeof str);
   const b = Buffer.from(str, 'base64');
   const res = Uint8Array.from(b);
 
   return res;
-  // const input = atob(str);
-  // const res = new Uint8Array(input.length);
-  // for (let i = 0; i < input.length; i++) {
-  //   res[i] = input.charCodeAt(i);
-  // }
-  // return res;
 }
 
 function load(input) {
@@ -242,7 +236,7 @@ function load(input) {
     name,
     seed,
     score,
-    // hex: `0x${seed.toString(16).padStart(4, '0').toUpperCase()}`,
+    hex: `0x${seed.toString(16).padStart(4, '0').toUpperCase()}`,
   };
 }
 
@@ -294,7 +288,7 @@ exports.handler = async (event, context) => {
     i += 7;
   }
 
-  const res = encodeScores(scores.slice(0, 10));
+  const res = encodeScores(scores.slice(0, 50));
 
   console.log(Buffer.from(res).toString('base64'));
 
@@ -304,50 +298,8 @@ exports.handler = async (event, context) => {
   };
 };
 
-// const last = load(
-//   toBytes('shMeAA4YIkBASlRJUFBRUFBRPV5eSkJMVmFgYGBfW1JSW1JFTQ==')
+// load(
+//   toBytes(
+//     'Fh+UAFNTU0pLS0tLXhgYIitGWj5RU1BaSkBVVF5AQFRMTDIqVSk8XjVKSVFbW1FRCDAmMBokWVdXQw5KV0JVCwwURjxUVDNHR0pTURIcBBouSCpIT0tLVF5UTRRXU11TPVtcXFtaUR8zBS1ANkBdVxESGjlNYWFhVVVeXFJeW1paShkwGCsrXzdKSkFVXktMS1FHUVFHPFJSRU0='
+//   )
 // ); // ?
-// let applied = false;
-
-// const prev = Uint8Array.from([
-//   0x52,
-//   0x45,
-//   0x4d,
-//   0xb2,
-//   0x13,
-//   0x58,
-//   0x07,
-//   0x41,
-//   0x42,
-//   0x49,
-//   0x01,
-//   0x00,
-//   0x96,
-//   0x02,
-//   0x52,
-//   0x47,
-//   0x53,
-//   0x01,
-//   0x00,
-//   0xea,
-//   0x02,
-// ]);
-// const view = new DataView(prev.buffer);
-// let i = 0;
-// const scores = [];
-// while (i < view.byteLength) {
-//   const name = new TextDecoder().decode(view.buffer.slice(i, i + 3));
-//   const seed = view.getUint16(i + 3, true);
-//   const score = view.getUint16(i + 5, true);
-
-//   if (!applied && last.score > score) {
-//     scores.push(last);
-//     applied = true;
-//   }
-
-//   scores.push({ name, seed, score });
-//   i += 7;
-// }
-
-// scores.slice(0, 10);
-// Buffer.from(encodeScores(scores)).toString('base64'); // ?
