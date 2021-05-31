@@ -259,18 +259,9 @@ function test(base64) {
   return last;
 }
 
-exports.handler = async (event, context) => {
-  // Only allow POST
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
-  // When the method is POST, the name will no longer be in the event’s
-  // queryStringParameters – it’ll be in the event body encoded as a query string
-  const params = querystring.parse(event.body);
-  console.log(JSON.stringify(event.body));
-  const input = toBytes(params.data);
-  const previous = toBytes(params.previous);
+function calculateHighScoreTable(base64Input, base64Previous) {
+  const input = toBytes(base64Input);
+  const previous = toBytes(base64Previous);
 
   // first validate and generate score
   const last = load(input);
@@ -294,7 +285,27 @@ exports.handler = async (event, context) => {
     i += 7;
   }
 
-  const res = encodeScores(scores.slice(0, 50));
+  if (!applied) {
+    scores.push(last);
+  }
+
+  return scores.slice(0, 50);
+}
+
+exports.handler = async (event, context) => {
+  // Only allow POST
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+
+  // When the method is POST, the name will no longer be in the event’s
+  // queryStringParameters – it’ll be in the event body encoded as a query string
+  const params = querystring.parse(event.body);
+  console.log(JSON.stringify(event.body));
+
+  const res = encodeScores(
+    calculateHighScoreTable(params.data, params.previous)
+  );
 
   console.log(Buffer.from(res).toString('base64'));
 
