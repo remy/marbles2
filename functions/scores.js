@@ -253,6 +253,12 @@ function encodeScores(scores) {
   return res;
 }
 
+function test(base64) {
+  const input = toBytes(base64);
+  const last = load(input);
+  return last;
+}
+
 exports.handler = async (event, context) => {
   // Only allow POST
   if (event.httpMethod !== 'POST') {
@@ -297,9 +303,3 @@ exports.handler = async (event, context) => {
     body: Buffer.from(res).toString('base64'),
   };
 };
-
-// load(
-//   toBytes(
-//     'Fh+UAFNTU0pLS0tLXhgYIitGWj5RU1BaSkBVVF5AQFRMTDIqVSk8XjVKSVFbW1FRCDAmMBokWVdXQw5KV0JVCwwURjxUVDNHR0pTURIcBBouSCpIT0tLVF5UTRRXU11TPVtcXFtaUR8zBS1ANkBdVxESGjlNYWFhVVVeXFJeW1paShkwGCsrXzdKSkFVXktMS1FHUVFHPFJSRU0='
-//   )
-// ); // ?
