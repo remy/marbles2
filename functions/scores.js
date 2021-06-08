@@ -109,7 +109,7 @@ class Game {
 
     const { x, y } = this.indexToCoords({ i });
     const tagged = this.tag({ x, y, match, expect: 0, bit: EMPTY });
-    const total = tagged.length;
+    const total = tagged ? tagged.length : 0;
 
     if (total <= 1) {
       throw new Error('not enough matched');
@@ -303,9 +303,16 @@ exports.handler = async (event, context) => {
   const params = querystring.parse(event.body);
   console.log(JSON.stringify(event.body));
 
-  const res = encodeScores(
-    calculateHighScoreTable(params.data, params.previous)
-  );
+  let scores = null;
+  try {
+    calculateHighScoreTable(params.data, params.previous);
+  } catch (e) {
+    return {
+      statusCode: 400,
+      body: e.message,
+    };
+  }
+  const res = encodeScores(scores);
 
   console.log(Buffer.from(res).toString('base64'));
 
