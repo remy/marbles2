@@ -4,6 +4,7 @@ const EMPTY = 16;
 const length = 10;
 const MULTIPLIER = 1;
 const LEVEL_UP_BONUS = 250;
+const highScoreSize = 8;
 
 class Game {
   grid = [];
@@ -247,12 +248,11 @@ function load(input) {
 }
 
 function encodeScores(scores) {
-  const highScoreSize = 8;
   const res = new Uint8Array(scores.length * highScoreSize);
   const view = new DataView(res.buffer);
   let i = 0;
   scores.forEach(({ name, seed, score, level }, i) => {
-    res.set(new TextEncoder().encode(name), i * 7);
+    res.set(new TextEncoder().encode(name), i * highScoreSize);
     view.setUint8(i * highScoreSize + 3, level, true);
     view.setUint16(i * highScoreSize + 4, seed, true);
     view.setUint16(i * highScoreSize + 6, score, true);
@@ -291,7 +291,7 @@ function calculateHighScoreTable(base64Input, base64Previous) {
     }
 
     scores.push({ name, seed, score, level });
-    i += 8;
+    i += highScoreSize;
   }
 
   if (!applied) {
