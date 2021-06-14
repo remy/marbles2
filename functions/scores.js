@@ -247,13 +247,15 @@ function load(input) {
 }
 
 function encodeScores(scores) {
-  const res = new Uint8Array(scores.length * 7);
+  const highScoreSize = 8;
+  const res = new Uint8Array(scores.length * highScoreSize);
   const view = new DataView(res.buffer);
   let i = 0;
-  scores.forEach(({ name, seed, score }, i) => {
+  scores.forEach(({ name, seed, score, level }, i) => {
     res.set(new TextEncoder().encode(name), i * 7);
-    view.setUint16(i * 7 + 3, seed, true);
-    view.setUint16(i * 7 + 5, score, true);
+    view.setUint8(i * highScoreSize + 3, level, true);
+    view.setUint16(i * highScoreSize + 4, seed, true);
+    view.setUint16(i * highScoreSize + 6, score, true);
   });
 
   return res;
@@ -279,15 +281,16 @@ function calculateHighScoreTable(base64Input, base64Previous) {
   const scores = [];
   while (i < view.byteLength) {
     const name = new TextDecoder().decode(view.buffer.slice(i, i + 3));
-    const seed = view.getUint16(i + 3, true);
-    const score = view.getUint16(i + 5, true);
+    const level = view.getUint8(i + 3, true);
+    const seed = view.getUint16(i + 4, true);
+    const score = view.getUint16(i + 6, true);
 
     if (!applied && last.score > score) {
       scores.push(last);
       applied = true;
     }
 
-    scores.push({ name, seed, score });
+    scores.push({ name, seed, score, level });
     i += 7;
   }
 
@@ -327,3 +330,8 @@ exports.handler = async (event, context) => {
     body: Buffer.from(res).toString('base64'),
   };
 };
+
+// exports.handler({
+//   httpMethod: 'POST',
+//   body: 'data=GxUcABARGyUwOztNV2FhVmBhX19UVFRIUlIzPUdHW1BTQU0%3D&previous=',
+// }); // ?
