@@ -291,7 +291,7 @@ function calculateHighScoreTable(base64Input, base64Previous) {
     }
 
     scores.push({ name, seed, score, level });
-    i += 7;
+    i += 8;
   }
 
   if (!applied) {
@@ -321,6 +321,7 @@ exports.handler = async (event, context) => {
       body: e.message,
     };
   }
+
   const res = encodeScores(scores);
 
   console.log(Buffer.from(res).toString('base64'));
@@ -333,5 +334,5 @@ exports.handler = async (event, context) => {
 
 // exports.handler({
 //   httpMethod: 'POST',
-//   body: 'data=GxUcABARGyUwOztNV2FhVmBhX19UVFRIUlIzPUdHW1BTQU0%3D&previous=',
+//   body: 'data=A1c3ABgWFDM9R1xSSEZeX1MnJ2JjYlhWTFtUVFtbWxQfKT1HUlNUXFpMTU1XYUxWV2BfXl5UX11dW1tSRU0%3D&previous=U0FNARsV1AE%3D',
 // }); // ?
