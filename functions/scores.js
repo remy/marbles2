@@ -8,6 +8,7 @@ const LEVEL_UP_BONUS = 250;
 class Game {
   grid = [];
   seed = Uint16Array.of(1);
+  level = 1;
 
   toggleTaggedTo(tagged, bit, clear = false) {
     tagged.forEach((i) => {
@@ -132,6 +133,7 @@ class Game {
     if (remain === 0) {
       this.init();
       // level up bonus
+      this.level++;
       score += LEVEL_UP_BONUS;
     }
 
@@ -237,6 +239,7 @@ function load(input) {
 
   return {
     name,
+    level: m.level,
     seed,
     score,
     hex: `0x${seed.toString(16).padStart(4, '0').toUpperCase()}`,
@@ -264,7 +267,7 @@ function test(base64) {
 
 function calculateHighScoreTable(base64Input, base64Previous) {
   const input = toBytes(base64Input);
-  const previous = toBytes(base64Previous);
+  const previous = toBytes(base64Previous || '');
 
   // first validate and generate score
   const last = load(input);
@@ -308,7 +311,7 @@ exports.handler = async (event, context) => {
 
   let scores = null;
   try {
-    calculateHighScoreTable(params.data, params.previous);
+    scores = calculateHighScoreTable(params.data, params.previous);
   } catch (e) {
     return {
       statusCode: 400,
