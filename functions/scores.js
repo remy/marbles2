@@ -3,6 +3,7 @@ const querystring = require('querystring');
 const EMPTY = 16;
 const length = 10;
 const MULTIPLIER = 1;
+const LEVEL_UP_BONUS = 250;
 
 class Game {
   grid = [];
@@ -126,13 +127,15 @@ class Game {
 
     const remain = grid.filter((_) => _ !== EMPTY).length;
 
+    let score = total * (MULTIPLIER + total);
+
     if (remain === 0) {
       this.init();
+      // level up bonus
+      score += LEVEL_UP_BONUS;
     }
 
-    return total * (MULTIPLIER + total);
-
-    // return new Promise((resolve) => setTimeout(resolve, 200));
+    return score;
   }
 
   rnd() {
