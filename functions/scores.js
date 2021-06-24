@@ -1,4 +1,5 @@
 const querystring = require('querystring');
+const axios = require('axios');
 
 const EMPTY = 16;
 const length = 10;
@@ -301,10 +302,17 @@ function calculateHighScoreTable(base64Input, base64Previous) {
   return scores.slice(0, 50);
 }
 
+let cachedScores = null;
+
 exports.handler = async (event, context) => {
   // Only allow POST
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    if (cachedScores) {
+      return { statusCode: 200, body: cachedScores, isBase64Encoded: true };
+    }
+    const { status, data } = await axios.get('http://data.remysharp.com/6');
+    cachedScores = data;
+    return { statusCode: status, body: data, isBase64Encoded: true };
   }
 
   // When the method is POST, the name will no longer be in the event’s
