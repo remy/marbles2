@@ -40,6 +40,7 @@ html {
 
 h1 {
   text-align: center;
+  font-weight: 400;
 }
 
 p {
@@ -55,7 +56,7 @@ body {
   max-width: 872px;
   padding: 100px 0;
   background: url(background@2x.png) no-repeat top center;
-  background-size: 100%;
+  background-size: 872.5px;
   min-height: 660px;
 }
 
@@ -128,4 +129,19 @@ a > div:after {
   color: cyan;
   top: 12px;
   left: 2px;
+}
+
+@media screen and (max-width: 520px) {
+  html {
+    justify-content: flex-start;
+  }
+  
+  body {
+    background-image: none;
+    padding: 12px;
+    padding-top: 0;
+  }
+  td.name span {
+    display: none;
+  }
 }

@@ -22,12 +22,12 @@ function scoreHTML(scores) {
   return scores
     .map(
       ({ name, seed, score }, i) =>
-        `<tr><td class="name">${(i + 1)
+        `<tr><td class="name"><span>${(i + 1)
           .toString()
           .padStart(
             2,
             ' '
-          )}.${name}</td><td class="seed">#${seed}</td><td class="score">${score}</td></tr>`
+          )}.</span>${name}</td><td class="seed">#${seed}</td><td class="score">${score}</td></tr>`
     )
     .join('\n');
 }
