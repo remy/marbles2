@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Marbles²</title>
+    <link rel="stylesheet" href="/play/index.css">
+  </head>
+
+  <body id="play">
+    <main>
+      <div id="app"></div>
+      <aside>
+        <div class="status">
+          <p class="score">Score<span></span></p>
+          <p class="cleared">Cleared<span></span></p>
+          <p class="moves">moves<span></span></p>
+          <p class="remain">remain<span></span></p>
+          <p class="level">level<span></span></p>
+          <p class="seed">seed<span></span></p>
+          <p hidden class="best">best<span></span></p>
+        </div>
+        <div class="controls">
+          <h2>Controls</h2>
+          <ul>
+            <li><button class="link">
+                <div>undo</div>
+              </button></li>
+            <li><a class="restart" href="/play?seed=1">
+                <div>restart</div>
+              </a></li>
+            <li><a href="/play">
+                <div>new level</div>
+              </a></li>
+            <li><a href="/">
+                <div>exit</div>
+              </a></li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+    <script src="/play/index.js" type="module"></script>
+  </body>
+
+</html>
