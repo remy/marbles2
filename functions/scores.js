@@ -311,7 +311,6 @@ exports.handler = async (event, context) => {
       return { statusCode: 200, body: cachedScores, isBase64Encoded: true };
     }
     const { status, data } = await axios.get('http://data.remysharp.com/6');
-    cachedScores = data;
     return { statusCode: status, body: data, isBase64Encoded: true };
   }
 
