@@ -68,6 +68,8 @@ class Game {
       }
     });
 
+    $('#undo').addEventListener('click', () => this.undo());
+
     this.scale = 3;
     this.initialState(seed);
     let last = '';
