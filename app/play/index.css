@@ -71,9 +71,9 @@ body > footer {
   margin: 0 auto;
 }
 
-a {
+/* a {
   color: #fff;
-}
+} */
 
 #highscore .seed {
   color: #929292;
@@ -122,11 +122,16 @@ a > div,
 
 a:hover > div,
 .link:hover > div {
-  color: white;
+  /* color: white; */
 }
 
 a > div:first-letter,
 .link > div:first-letter {
+  color: white;
+}
+
+#play a:hover > div:first-letter,
+#play .link:hover > div:first-letter {
   color: white;
 }
 
@@ -138,17 +143,18 @@ a > div:after,
   bottom: 0px;
   vertical-align: bottom;
   color: cyan;
-  top: 12px;
   font-weight: bold;
+  top: 12px;
   left: 2px;
+}
+
+#play a:hover > div:after,
+#play .link:hover > div:after {
+  color: cyan;
 }
 
 #play a > div:after,
 #play .link > div:after {
-  position: absolute;
-  bottom: 0px;
-  vertical-align: bottom;
-  color: cyan;
   top: 9px;
   left: 0px;
 }
@@ -230,8 +236,15 @@ button.link {
 }
 
 #play .controls {
-  border: 4px solid #b6b6b6;
-  padding: 4px 8px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+
+  border-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAbklEQVQ4je2UUQrAIAxDe/8DJcdzP8KE2ZpCBQcW8iV9DUJiNgyA5on03wA08yZaWimErhxRgaYvR7vdUC0UW6D8QhWQcuBCN0D5G6eVUM4SVeZUKggBFMeUPC37iRp0RcFEGoq3tPPQ/s+RRs4DpMmkCLFR9tQAAAAASUVORK5CYII=')
+    7 / 7px / 0 round;
+  border-width: 7px;
+  border-style: solid;
+
+  padding: 4px;
   position: relative;
   margin-bottom: 16px;
 }
@@ -247,7 +260,7 @@ button.link {
   display: inline-block;
   position: absolute;
   margin: 0 10px;
-  top: -10px;
+  top: -12px;
   padding: 0 8px;
 }
 
@@ -260,9 +273,9 @@ button.link {
   margin: 14px 0;
 }
 
-#play.playing .controls div:first-letter,
-#play.playing .controls div:after {
-  color: #929292 !important;
+.playing .controls div:first-letter,
+.playing .controls div:after {
+  color: #929292;
 }
 
 @media screen and (max-width: 520px) {
@@ -287,8 +300,12 @@ button.link {
   }
 
   #play aside {
-    margin-top: 32px;
+    margin-top: 16px;
     margin-left: 0;
+  }
+
+  #play p.level {
+    margin-top: 8px;
   }
 
   #canvas {

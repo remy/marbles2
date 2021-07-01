@@ -120,7 +120,7 @@ class Game {
    *
    * @param {Event} e
    */
-  handleClick(e) {
+  async handleClick(e) {
     if (!this.marbles.canMove()) {
       return;
     }
@@ -138,7 +138,7 @@ class Game {
       cleared: this.state.cleared,
     });
     try {
-      this.state.score += this.marbles.clear(index);
+      this.state.score += await this.marbles.clear(index, () => this.render());
     } catch (e) {
       this.snapshots.pop(); // discard
       return;
@@ -193,7 +193,7 @@ class Game {
     this.screen.setCursor(63);
   }
 
-  render(grid = this.marbles.grid) {
+  async render(grid = this.marbles.grid) {
     // console.log('render');
     const length = grid.length;
     this.screen.startDraw();
@@ -204,6 +204,7 @@ class Game {
       this.screen.drawSprite(index + 30, x, y);
     }
     this.screen.endDraw();
+    // await this.marbles.wait(50);
   }
 }
 

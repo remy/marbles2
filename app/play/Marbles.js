@@ -40,7 +40,7 @@ export default class Marbles {
     });
   }
 
-  clearColumn({ i, x, y, speed = 10 }) {
+  async clearColumn({ i, x, y, speed = 10, render }) {
     const grid = this.grid;
     let swapped = false;
     const coords = { x, y };
@@ -65,6 +65,8 @@ export default class Marbles {
       grid[i] = grid[target];
       grid[target] = tmp;
       i = target;
+      render();
+      await this.wait(speed);
     } while (true);
 
     return swapped;
@@ -124,14 +126,18 @@ export default class Marbles {
     return swapped;
   }
 
-  fall() {
+  async wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async fall(render) {
     const grid = this.grid;
     const edge = length - 1;
     for (var x = 0; x < length; x++) {
       for (var y = edge; y >= 0; y--) {
         let i = this.coordsToIndex({ x, y });
         if (grid[i] & EMPTY) {
-          if (this.clearColumn({ x, y, i })) {
+          if (await this.clearColumn({ x, y, i, render })) {
             y++; // go back and check the starting block
           }
         }
@@ -182,7 +188,7 @@ export default class Marbles {
     return false;
   }
 
-  clear(i) {
+  async clear(i, render) {
     const grid = this.grid;
     const match = grid[i];
 
@@ -197,7 +203,7 @@ export default class Marbles {
     }
 
     this.toggleTaggedTo(tagged, EMPTY, true);
-    this.fall();
+    await this.fall(render);
 
     grid.forEach((_, i) => {
       if (grid[i] & EMPTY) {
