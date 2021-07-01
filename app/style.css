@@ -132,7 +132,7 @@ a > div:after {
 }
 
 #themes {
-  display: flex;
+  display: none;
   justify-content: center;
   margin-top: 32px;
 }
@@ -145,11 +145,11 @@ a > div:after {
 }
 
 #themes div input {
-   display: block;
-   height: 30px;
-   width: 30px;
-   margin-right: 16px;
-   margin-left: 16px;
+  display: block;
+  height: 30px;
+  width: 30px;
+  margin-right: 16px;
+  margin-left: 16px;
 }
 
 #themes img {
@@ -161,7 +161,11 @@ a > div:after {
   html {
     justify-content: flex-start;
   }
-  
+
+  #themes {
+    display: flex;
+  }
+
   body {
     background-image: none;
     padding: 12px;
