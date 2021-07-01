@@ -1,4 +1,4 @@
-export const EMPTY = 16;
+export const EMPTY = 4;
 const length = 10;
 const MULTIPLIER = 1;
 const LEVEL_UP_BONUS = 250;
@@ -34,9 +34,10 @@ export default class Marbles {
   seed = Uint16Array.of(1);
   level = 1;
 
-  toggleTaggedTo(tagged, bit, clear = false) {
+  toggleTaggedTo(tagged, bit) {
     tagged.forEach((i) => {
-      this.grid[i] ^= bit;
+      // this.grid[i] ^= bit;
+      this.grid[i] = bit;
     });
   }
 

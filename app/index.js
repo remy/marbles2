@@ -1,4 +1,6 @@
-document.querySelector('#themes').addEventListener('change', (e) => {
+const themes = document.querySelector('#themes > div');
+
+themes.addEventListener('change', (e) => {
   if (e.target.nodeName !== 'INPUT') {
     return;
   }
@@ -6,6 +8,9 @@ document.querySelector('#themes').addEventListener('change', (e) => {
   const theme = parseInt(e.target.value, 10);
   localStorage.setItem('theme', theme);
 });
+
+const theme = +localStorage.getItem('theme') || 0;
+themes.children[theme].checked = true;
 
 async function highScores() {
   const data = new DataView(
