@@ -131,6 +131,32 @@ a > div:after {
   left: 2px;
 }
 
+#themes {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+#themes div {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: space-evenly;
+}
+
+#themes div input {
+   display: block;
+   height: 30px;
+   width: 30px;
+   margin-right: 16px;
+   margin-left: 16px;
+}
+
+#themes img {
+  height: 320px;
+  image-rendering: pixelated;
+}
+
 @media screen and (max-width: 520px) {
   html {
     justify-content: flex-start;

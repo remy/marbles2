@@ -14,6 +14,15 @@ function asHex(n) {
 }
 
 class Game {
+  get theme() {
+    return this._theme;
+  }
+
+  set theme(value) {
+    this._theme = value * 5;
+    localStorage.setItem('theme', value);
+  }
+
   tick() {
     if (this.frames.length) {
       const frame = this.frames.shift();
@@ -58,6 +67,7 @@ class Game {
    * @param {Screen} options.screen
    */
   constructor({ screen, seed = 0 }) {
+    this.theme = +localStorage.getItem('theme') || 0;
     this.frames = [];
     this.screen = screen;
     screen.ctx.canvas.addEventListener('click', (e) => this.handleClick(e));
@@ -83,22 +93,6 @@ class Game {
       this.state.level++;
       this.snapshots = [];
     };
-
-    // this.marbles.grid.trigger = ({ index, oldValue, newValue }) => {
-    //   const current = this.marbles.grid.join(',');
-    //   if (last !== current) {
-    //     this.frames.push(() => {
-    //       const { x, y } = this.marbles.indexToCoords({ i: index });
-    //       if (newValue === EMPTY) {
-    //         console.log('empty', x, y);
-    //         this.screen.clearSprite(x, y);
-    //       } else {
-    //         this.screen.drawSprite(newValue + 30, x, y);
-    //       }
-    //     });
-    //     last = current;
-    //   }
-    // };
   }
 
   undo() {
@@ -129,7 +123,6 @@ class Game {
 
     const x = (offsetX / scale) | 0;
     const y = (offsetY / scale) | 0;
-    console.log({ offsetX, x, offsetY, y, scale });
     const index = this.marbles.coordsToIndex({ x, y });
     this.snapshots.push({
       grid: Array.from(this.marbles.grid),
@@ -197,11 +190,10 @@ class Game {
     // console.log('render');
     const length = grid.length;
     this.screen.startDraw();
-    const theme = 30;
     for (let i = 0; i < length; i++) {
       const index = grid[i];
       const { x, y } = this.marbles.indexToCoords({ i });
-      this.screen.drawSprite(index + 30, x, y);
+      this.screen.drawSprite(index + this.theme, x, y);
     }
     this.screen.endDraw();
     // await this.marbles.wait(50);

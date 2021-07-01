@@ -40,7 +40,7 @@ export default class Marbles {
     });
   }
 
-  async clearColumn({ i, x, y, speed = 10, render }) {
+  async clearColumn({ i, x, y, speed = 0, render }) {
     const grid = this.grid;
     let swapped = false;
     const coords = { x, y };

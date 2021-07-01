@@ -1,0 +1,21 @@
+{
+  "lang": "en",
+  "short_name": "Marbles",
+  "name": "Marbles Squared",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "300x300",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000",
+  "theme_color": "#000"
+}

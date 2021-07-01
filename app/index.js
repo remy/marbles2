@@ -1,3 +1,12 @@
+document.querySelector('#themes').addEventListener('change', (e) => {
+  if (e.target.nodeName !== 'INPUT') {
+    return;
+  }
+
+  const theme = parseInt(e.target.value, 10);
+  localStorage.setItem('theme', theme);
+});
+
 async function highScores() {
   const data = new DataView(
     await fetch('/scores').then((res) => res.arrayBuffer())
