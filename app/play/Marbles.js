@@ -66,8 +66,10 @@ export default class Marbles {
       grid[i] = grid[target];
       grid[target] = tmp;
       i = target;
-      render();
-      await this.wait(speed);
+      if (render) {
+        render();
+        await this.wait(speed);
+      }
     } while (true);
 
     return swapped;
@@ -189,7 +191,7 @@ export default class Marbles {
     return false;
   }
 
-  async clear(i, render) {
+  async clear(i, render = null) {
     const grid = this.grid;
     const match = grid[i];
 

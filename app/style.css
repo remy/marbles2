@@ -51,6 +51,10 @@ p {
   line-height: 32px;
 }
 
+p:last-child {
+  margin-bottom: 0;
+}
+
 body {
   width: 100%;
   max-width: 872px;
@@ -174,4 +178,32 @@ a > div:after {
   td.name span {
     display: none;
   }
+}
+
+textarea {
+  width: 100%;
+  background: #222;
+  border: 1px solid #000;
+  color: #ccc;
+  font-family: monospace;
+}
+
+button {
+  font-family: monospace;
+  cursor: pointer;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+main {
+  flex: 1;
+}
+
+main,
+footer {
+  width: 100%;
 }
