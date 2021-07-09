@@ -111,6 +111,11 @@ a {
   text-decoration: none;
 }
 
+li > a {
+  border-bottom: 2px solid white;
+  padding-bottom: 4px;
+}
+
 a > div {
   color: #929292;
   position: relative;
