@@ -290,7 +290,7 @@ function calculateHighScoreTable(base64Input, base64Previous) {
 
     if (applied === -1 && last.score > score) {
       scores.push(last);
-      applied = i / highScoreSize - 1;
+      applied = i / highScoreSize;
     }
 
     scores.push({ name, seed, score, level });
