@@ -278,25 +278,41 @@ function calculateHighScoreTable(base64Input, base64Previous) {
   // then parse previous for high scores and insert to new position
   const view = new DataView(previous.buffer);
   let i = 0;
-  let applied = false;
-  const scores = [];
+  let applied = -1;
+  let scores = [];
+
+  // goes from highest score to lowest
   while (i < view.byteLength) {
     const name = new TextDecoder().decode(view.buffer.slice(i, i + 3));
     const level = view.getUint8(i + 3, true);
     const seed = view.getUint16(i + 4, true);
     const score = view.getUint16(i + 6, true);
 
-    if (!applied && last.score > score) {
+    if (applied === -1 && last.score > score) {
       scores.push(last);
-      applied = true;
+      applied = i / highScoreSize - 1;
     }
 
     scores.push({ name, seed, score, level });
+
     i += highScoreSize;
   }
 
-  if (!applied) {
+  if (applied === -1) {
     scores.push(last);
+  } else {
+    // search for and remove _other_ entries for the same name
+    scores = scores.filter((entry, i) => {
+      if (i === applied) {
+        return true;
+      }
+
+      if (entry.name !== last.name) {
+        return true;
+      }
+
+      return false;
+    });
   }
 
   return scores.slice(0, 50);
@@ -341,5 +357,5 @@ exports.handler = async (event, context) => {
 
 // exports.handler({
 //   httpMethod: 'POST',
-//   body: 'data=A1c3ABgWFDM9R1xSSEZeX1MnJ2JjYlhWTFtUVFtbWxQfKT1HUlNUXFpMTU1XYUxWV2BfXl5UX11dW1tSRU0%3D&previous=U0FNARsV1AE%3D',
+//   body: 'data=WQs5ADUqSDkjI1MgH0FJXVBQXFw8SFtRUVFcXVxLSV5dXVJcWyw/TFVBRz41OTpPTlhNIDw9MzQ/XF9eXEFWIA%3D%3D&previous=UkVNBgTlLhVSRU0FBOXWD1hYWAOZmfwJSlVMA9OBPAhSRU0DUPMKCEFWIAJZC3oHQVYgAk1zMgdkUkUCBOXyBmRhMgJ0W8AGQVYgAgTlvgZSRU0CmZmgBmFkZQIMK/AFZG9nAsmCuAVSRU4CBOVCBUFWIAEE5YIEY2xvAdZP/gJKVUwB/SpsAmRhbgEFoVwCa2t/AX8VXAJEUkUBBOVUAjIyMgEdHy4CSklNAdZPDgJyZW0BSr/8AURBRAHiXvYBSkVFAeCK9gFqYW0BERH0ATQ4NAEHAOQBcmVtAdZP4AFhYWEBRpLaAVNBTQEbFdQBMTExARvmygFyZW0BGxXCAXM3cwFXV2YBAAAAAS0/IAAAAAABLT8gAA%3D%3D',
 // }); // ?
