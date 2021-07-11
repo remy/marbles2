@@ -24,7 +24,7 @@ async function highScores() {
   for (let i = 0; i < data.byteLength; i += 8) {
     const name = new TextDecoder().decode(data.buffer.slice(i, i + 3));
     const level = data.getUint8(i + 3);
-    const seed = data.getUint16(i + 4, true).toString(16);
+    const seed = data.getUint16(i + 4, true).toString(16).padStart(4, '0');
     const score = data.getUint16(i + 6, true);
     scores.push({ name, level, seed, score });
     if (scores.length === 10) break;
