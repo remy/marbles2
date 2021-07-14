@@ -101,10 +101,15 @@ class Game {
     }
 
     this.plot.pop();
-    const { grid, score, remain, cleared } = this.snapshots.pop();
+    const { grid, score, remain, cleared, delta } = this.snapshots.pop();
     this.marbles.grid = grid;
     this.frames.push(grid);
-    this.state.score = score;
+    const d = delta + this.marbles.level * 25;
+    if (this.state.score - d < 0) {
+      this.state.score = 0;
+    } else {
+      this.state.score -= d;
+    }
     this.state.remain = remain;
     this.state.cleared = cleared;
     this.state.moves = this.plot.length;
@@ -130,12 +135,17 @@ class Game {
       remain: this.state.remain,
       cleared: this.state.cleared,
     });
+    let score = 0;
     try {
-      this.state.score += await this.marbles.clear(index, () => this.render());
+      score = await this.marbles.clear(index, () => this.render());
     } catch (e) {
       this.snapshots.pop(); // discard
       return;
     }
+
+    this.snapshots[this.snapshots.length - 1].delta = score;
+    this.state.score += score;
+
     this.plot.push(index);
     this.state.moves = this.plot.length;
     this.state.remain = this.marbles.remain;

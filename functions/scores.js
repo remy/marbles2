@@ -1,24 +1,25 @@
 const querystring = require('querystring');
 const axios = require('axios');
 
-const EMPTY = 16;
+const EMPTY = 4;
 const length = 10;
 const MULTIPLIER = 1;
 const LEVEL_UP_BONUS = 250;
 const highScoreSize = 8;
 
-class Game {
-  grid = [];
+class Marbles {
+  grid = []; //new EventArray();
   seed = Uint16Array.of(1);
   level = 1;
 
-  toggleTaggedTo(tagged, bit, clear = false) {
+  toggleTaggedTo(tagged, bit) {
     tagged.forEach((i) => {
-      this.grid[i] ^= bit;
+      // this.grid[i] ^= bit;
+      this.grid[i] = bit;
     });
   }
 
-  clearColumn({ i, x, y, speed = 10 }) {
+  async clearColumn({ i, x, y, speed = 0, render }) {
     const grid = this.grid;
     let swapped = false;
     const coords = { x, y };
@@ -43,9 +44,36 @@ class Game {
       grid[i] = grid[target];
       grid[target] = tmp;
       i = target;
+      if (render) {
+        render();
+        await this.wait(speed);
+      }
     } while (true);
 
     return swapped;
+  }
+
+  log() {
+    let s = '';
+    const values = {
+      0: '&',
+      1: '@',
+      2: '#',
+      3: 'O',
+      16: ' ',
+    };
+    for (let y = 0; y < 10; y++) {
+      for (let x = 0; x < 10; x++) {
+        const value = this.grid[this.coordsToIndex({ x, y })];
+        s += values[value];
+      }
+      s += '\n';
+    }
+    console.log(
+      '%c' + s,
+      'font-family: monospace; white-space: pre; font-size: 24px;'
+    );
+    return undefined;
   }
 
   shiftColumn({ x, y, i, speed }) {
@@ -79,14 +107,18 @@ class Game {
     return swapped;
   }
 
-  fall() {
+  async wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async fall(render) {
     const grid = this.grid;
     const edge = length - 1;
     for (var x = 0; x < length; x++) {
       for (var y = edge; y >= 0; y--) {
         let i = this.coordsToIndex({ x, y });
         if (grid[i] & EMPTY) {
-          if (this.clearColumn({ x, y, i })) {
+          if (await this.clearColumn({ x, y, i, render })) {
             y++; // go back and check the starting block
           }
         }
@@ -105,11 +137,43 @@ class Game {
     }
   }
 
-  clear(i) {
+  canMove() {
+    const length = 10;
+    const edge = length - 1;
+    const grid = this.grid;
+
+    for (let x = 0; x < length; x++) {
+      for (let y = edge; y >= 0; y--) {
+        let i = this.coordsToIndex({ x, y });
+        const test = grid[i];
+
+        if (test & EMPTY) {
+          continue;
+        }
+
+        if (test === grid[this.coordsToIndex({ x: x - 1, y })]) {
+          return true;
+        }
+        if (test === grid[this.coordsToIndex({ x: x + 1, y })]) {
+          return true;
+        }
+        if (test === grid[this.coordsToIndex({ x: x, y: y - 1 })]) {
+          return true;
+        }
+        if (test === grid[this.coordsToIndex({ x: x, y: y + 1 })]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  async clear(i, render = null) {
     const grid = this.grid;
     const match = grid[i];
 
-    if (match === EMPTY) return 0;
+    if (match === EMPTY) throw new Error('empty select');
 
     const { x, y } = this.indexToCoords({ i });
     const tagged = this.tag({ x, y, match, expect: 0, bit: EMPTY });
@@ -120,7 +184,7 @@ class Game {
     }
 
     this.toggleTaggedTo(tagged, EMPTY, true);
-    this.fall();
+    await this.fall(render);
 
     grid.forEach((_, i) => {
       if (grid[i] & EMPTY) {
@@ -129,14 +193,17 @@ class Game {
     });
 
     const remain = grid.filter((_) => _ !== EMPTY).length;
+    this.remain = remain;
 
     let score = total * (MULTIPLIER + total);
+    this.cleared = total;
 
     if (remain === 0) {
       this.init();
       // level up bonus
       this.level++;
       score += LEVEL_UP_BONUS;
+      if (this.levelUp) this.levelUp();
     }
 
     return score;
@@ -151,10 +218,15 @@ class Game {
 
     this.seed = Uint16Array.of(xs[0]);
 
-    return 1 << (xs[0] & 3);
+    return xs[0] & 3;
+  }
+
+  getSeed() {
+    return this.seed[0];
   }
 
   init(s = 0) {
+    this.remain = 100;
     const grid = this.grid;
     if (s > 0) this.seed = Uint16Array.of(s);
 
@@ -212,8 +284,9 @@ function toBytes(str) {
   return res;
 }
 
-function load(input) {
+async function load(input) {
   let score = 0;
+  let source;
 
   if (typeof input === 'string') {
     source = Uint8Array.from(
@@ -233,10 +306,43 @@ function load(input) {
     new Uint8Array(view.buffer.slice(4 + length, 4 + length + 3))
   );
 
-  const m = new Game(seed);
+  // TODO add version check
+
+  const m = new Marbles(seed);
+  let snapshots = [];
+
+  m.levelUp = () => {
+    snapshots = [];
+  };
 
   for (let i = 0; i < data.length; i++) {
-    score += m.clear(data[i]);
+    if (data[i] === 255) {
+      // undo
+      if (snapshots.length) {
+        const { grid, delta } = snapshots.pop();
+        m.grid = grid;
+
+        const reset = delta + 25 * m.level;
+        if (score < reset) {
+          score = 0;
+        } else {
+          score = score - reset;
+        }
+      }
+    } else {
+      snapshots.push({
+        grid: Array.from(m.grid),
+        score,
+        cleared: m.cleared,
+      });
+      const delta = await m.clear(data[i]);
+
+      // snapshots is empty if it did a level up
+      if (snapshots.length) {
+        snapshots[snapshots.length - 1].delta = delta;
+      }
+      score += delta;
+    }
   }
 
   return {
@@ -264,16 +370,20 @@ function encodeScores(scores) {
 
 function test(base64) {
   const input = toBytes(base64);
-  const last = load(input);
-  return last;
+  return load(input);
 }
 
-function calculateHighScoreTable(base64Input, base64Previous) {
+// calculateHighScoreTable(
+//   'BOV7AAEpUUklGztjOExbVVVV/z5IUV1QWgsLGyJAQUFCR1tHVF5KXl4iUVJdWz4+W1tQWgEgFkf/SEhBUUdRKjRSXEAYLDNcXv9SSFxdW1tRUQwEJBonO0VYOUIrKT1HUVZWXVtbW1ooHgsXIyU6TTYfLT5FT///O0VHXF5ePFJFTQE=',
+//   'SERHDdeaIClSRU0LBOXYKGRhcAnXmkgdNDhLAwTl7gpYWFgDmZn8CVJHSAPhPGgJSlVMA9OBPAhBViACWQt6B2RSRQIE5fIGZGEyAnRbwAZhZGUCDCvwBWRvZwLJgrgFemFwAtearAVSRU4CBOVCBVNKTQIE5TAFY2xvAdZP/gJkYW4BBaFcAmtrfwF/FVwCRFJFAQTlVAIyMjIBHR8uAkpJTQHWTw4CcmVtAUq//AFEQUQB4l72AUpFRQHgivYBamFtARER9AE0ODQBBwDkAWFhYQFGktoBU0FNARsV1AExMTEBG+bKAXM3cwFXV2YB'
+// ); // ?
+
+async function calculateHighScoreTable(base64Input, base64Previous) {
   const input = toBytes(base64Input);
   const previous = toBytes(base64Previous || '');
 
   // first validate and generate score
-  const last = load(input);
+  const last = await load(input);
 
   // then parse previous for high scores and insert to new position
   const view = new DataView(previous.buffer);
@@ -337,7 +447,7 @@ exports.handler = async (event, context) => {
 
   let scores = null;
   try {
-    scores = calculateHighScoreTable(params.data, params.previous);
+    scores = await calculateHighScoreTable(params.data, params.previous);
   } catch (e) {
     return {
       statusCode: 400,
