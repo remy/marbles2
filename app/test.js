@@ -36,10 +36,42 @@ async function test(value) {
   );
 
   const m = new Game(seed);
+  let snapshots = [];
+
+  m.levelUp = () => {
+    snapshots = [];
+  };
+
   let score = 0;
 
   for (let i = 0; i < data.length; i++) {
-    score += await m.clear(data[i]);
+    if (data[i] === 255) {
+      // undo
+      if (snapshots.length) {
+        const { grid, delta } = snapshots.pop();
+        m.grid = grid;
+
+        const reset = delta + 25 * m.level;
+        if (score < reset) {
+          score = 0;
+        } else {
+          score = score - reset;
+        }
+      }
+    } else {
+      snapshots.push({
+        grid: Array.from(m.grid),
+        score,
+        cleared: m.cleared,
+      });
+      const delta = await m.clear(data[i]);
+
+      // snapshots is empty if it did a level up
+      if (snapshots.length) {
+        snapshots[snapshots.length - 1].delta = delta;
+      }
+      score += delta;
+    }
   }
 
   const result = {
