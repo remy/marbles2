@@ -23,6 +23,7 @@
   "homepage": "https://github.com/remy/marbles2#readme",
   "dependencies": {
     "axios": "^0.21.1",
+    "esm": "^3.2.25",
     "st": "^1.1.0"
   }
 }
