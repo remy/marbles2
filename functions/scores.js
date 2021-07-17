@@ -302,11 +302,15 @@ async function load(input) {
   const seed = view.getUint16(0, true);
   const length = view.getUint16(2, true);
   const data = new Uint8Array(view.buffer.slice(4, 4 + length));
+  let offset = 4 + length;
   const name = new TextDecoder().decode(
-    new Uint8Array(view.buffer.slice(4 + length, 4 + length + 3))
+    new Uint8Array(view.buffer.slice(offset, offset + 3))
   );
 
-  // TODO add version check
+  let version = 0;
+  try {
+    version = view.getUint8(offset + 3);
+  } catch (e) {}
 
   const m = new Marbles(seed);
   let snapshots = [];
@@ -346,6 +350,7 @@ async function load(input) {
   }
 
   return {
+    version,
     name,
     level: m.level,
     seed,
@@ -373,12 +378,49 @@ function test(base64) {
   return load(input);
 }
 
-// calculateHighScoreTable(
-//   'BOV7AAEpUUklGztjOExbVVVV/z5IUV1QWgsLGyJAQUFCR1tHVF5KXl4iUVJdWz4+W1tQWgEgFkf/SEhBUUdRKjRSXEAYLDNcXv9SSFxdW1tRUQwEJBonO0VYOUIrKT1HUVZWXVtbW1ooHgsXIyU6TTYfLT5FT///O0VHXF5ePFJFTQE=',
-//   'SERHDdeaIClSRU0LBOXYKGRhcAnXmkgdNDhLAwTl7gpYWFgDmZn8CVJHSAPhPGgJSlVMA9OBPAhBViACWQt6B2RSRQIE5fIGZGEyAnRbwAZhZGUCDCvwBWRvZwLJgrgFemFwAtearAVSRU4CBOVCBVNKTQIE5TAFY2xvAdZP/gJkYW4BBaFcAmtrfwF/FVwCRFJFAQTlVAIyMjIBHR8uAkpJTQHWTw4CcmVtAUq//AFEQUQB4l72AUpFRQHgivYBamFtARER9AE0ODQBBwDkAWFhYQFGktoBU0FNARsV1AExMTEBG+bKAXM3cwFXV2YB'
-// ); // ?
+async function fromData() {
+  const data = require('fs')
+    .readFileSync(__dirname + '/data', 'utf8')
+    .split('\n')
+    .map((_) => _.trim().split('|')[1])
+    .filter(Boolean);
 
-async function calculateHighScoreTable(base64Input, base64Previous) {
+  let result = '';
+  let res;
+
+  for (let i = 0; i < data.length; i++) {
+    const input = data[i].trim();
+
+    if (input.length) {
+      try {
+        res = await calculateHighScoreTable(input, result);
+        result = Buffer.from(await encodeScores(res)).toString('base64');
+      } catch (e) {
+        console.log(i, input, e);
+      }
+    }
+  }
+
+  console.log(result, res);
+}
+
+// calculateHighScoreTable(
+//   '15o1AFBbUUlcXEtMX2BdXlNTX0xdXf////9TXF1cXFtbLWFXYmJhLVQWFiA9R0ldXVVfX19SXFtQU01HAQ==','SERHE9earEBkYXAIGgGjFEF2IARTzTASUkVNBQTldxA0OEsDBOXuClhYWAOZmfwJUkdIA+E8aAlBViACWQt6B2FkZQIMK/AFTUJpAnjW0AVTTUcC15q8BWRvZwLJgrgFemFwAtearAVtYmkCMFRcBVNKTQIE5TAFTWUgAvoZjAQAAAABLT8gAAAAAAEtPyAA'
+
+// )
+//   .then((_) => {
+//     _; // ?
+//     return encodeScores(_);
+//   })
+//   .then((_) => {
+//     return Buffer.from(_).toString('base64');
+//   }); // ?
+
+async function calculateHighScoreTable(
+  base64Input,
+  base64Previous,
+  debug = false
+) {
   const input = toBytes(base64Input);
   const previous = toBytes(base64Previous || '');
 
@@ -388,8 +430,11 @@ async function calculateHighScoreTable(base64Input, base64Previous) {
   // then parse previous for high scores and insert to new position
   const view = new DataView(previous.buffer);
   let i = 0;
-  let applied = -1;
   let scores = [];
+  let applied = -1;
+
+  // hack to allow lower scores from the old version into the game
+  if (last.score < 1500) last.version = 1;
 
   // goes from highest score to lowest
   while (i < view.byteLength) {
@@ -398,9 +443,8 @@ async function calculateHighScoreTable(base64Input, base64Previous) {
     const seed = view.getUint16(i + 4, true);
     const score = view.getUint16(i + 6, true);
 
-    if (applied === -1 && last.score > score) {
+    if (applied === -1 && last.score > score && last.version) {
       scores.push(last);
-      applied = i / highScoreSize;
     }
 
     scores.push({ name, seed, score, level });
@@ -408,22 +452,25 @@ async function calculateHighScoreTable(base64Input, base64Previous) {
     i += highScoreSize;
   }
 
+  if (!last.version) {
+    return scores;
+  }
+
   if (applied === -1) {
     scores.push(last);
-  } else {
-    // search for and remove _other_ entries for the same name
-    scores = scores.filter((entry, i) => {
-      if (i === applied) {
-        return true;
-      }
-
-      if (entry.name !== last.name) {
-        return true;
-      }
-
-      return false;
-    });
   }
+
+  let seen = {};
+
+  // search for and remove _other_ entries for the same name
+  scores = scores.filter((entry, i) => {
+    if (seen[entry.name]) {
+      return false;
+    }
+
+    seen[entry.name] = true;
+    return true;
+  });
 
   return scores.slice(0, 50);
 }
