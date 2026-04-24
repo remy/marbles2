@@ -172,7 +172,7 @@
                   <th>Country</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="scores-normal">
                 <!-- SCORES:NORMAL:START -->
                 <tr class="empty">
                   <td colspan="6">— awaiting first entry —</td>
@@ -195,7 +195,7 @@
                   <th>Country</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="scores-fast">
                 <!-- SCORES:FAST:START -->
                 <tr>
                   <td class="rank num">1</td>
@@ -219,6 +219,43 @@
       </footer>
 
     </div>
+    <script>
+      (async () => {
+        let data;
+        try {
+          const res = await fetch('/api/gameboy-highscore');
+          if (!res.ok) return;
+          data = await res.json();
+        } catch { return; }
+
+        for (const mode of ['normal', 'fast']) {
+          const tbody = document.getElementById('scores-' + mode);
+          if (!tbody) continue;
+          const entries = (data[mode] || []).slice(0, 10);
+          if (entries.length === 0) continue;
+          tbody.innerHTML = entries.map((e, i) => {
+            const seed = '#' + Number(e.seed).toString(16).toUpperCase().padStart(4, '0');
+            const flag = toFlag(e.country);
+            return `<tr>`
+              + `<td class="rank num">${i + 1}</td>`
+              + `<td class="initials">${esc(e.initials)}</td>`
+              + `<td class="num">${Number(e.score).toLocaleString('en-GB')}</td>`
+              + `<td>${seed}</td>`
+              + `<td class="num">${Number(e.level)}</td>`
+              + `<td class="flag" title="${esc(e.country || '')}">${flag}</td>`
+              + `</tr>`;
+          }).join('');
+        }
+
+        function toFlag(cc) {
+          if (!cc || cc.length !== 2) return '';
+          return String.fromCodePoint(...[...cc.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+        }
+        function esc(s) {
+          return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+      })();
+    </script>
   </body>
 
 </html>

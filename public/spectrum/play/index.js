@@ -169,10 +169,10 @@ class Game {
     this.state.cleared = 0;
     this.state.remain = 100;
     this.seed = seed;
-    window.history.replaceState(null, null, '/play?seed=' + asHex(seed));
+    window.history.replaceState(null, null, '/spectrum/play/?seed=' + asHex(seed));
     this.marbles = new Marbles(seed);
     this.state.seed = this.seed;
-    $('.restart').href = '/play?seed=' + asHex(this.state.seed);
+    $('.restart').href = '/spectrum/play/?seed=' + asHex(this.state.seed);
     document.body.classList.add('playing');
     document.body.classList.remove('gameover');
   }

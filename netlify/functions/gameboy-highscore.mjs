@@ -47,6 +47,26 @@ function db() {
 }
 
 export default async (req) => {
+  if (req.method === 'GET') {
+    let client;
+    try { client = db(); }
+    catch (e) { return json(500, { ok: false, reason: `server not configured (${e.message})` }); }
+    try {
+      const rows = await client`
+        SELECT mode, initials, country, score, seed, level
+        FROM scores
+        WHERE mode IN ('normal', 'fast')
+        ORDER BY mode, score DESC
+        LIMIT 20
+      `;
+      const out = { normal: [], fast: [] };
+      for (const r of rows) out[r.mode]?.push(r);
+      return json(200, out);
+    } catch (e) {
+      return json(502, { ok: false, reason: `db read failed: ${e.message}` });
+    }
+  }
+
   if (req.method !== 'POST') {
     return json(405, { ok: false, reason: 'method not allowed' });
   }
