@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Marbles² — a Game Boy puzzler</title>
+    <meta name="description"
+      content="Marbles² is a Game Boy puzzler: clear the board by flooding groups of touching same-colour marbles.">
+    <meta property="og:title" content="Marbles² — a Game Boy puzzler">
+    <meta property="og:description"
+      content="Clear the board by flooding same-colour groups. A homebrew Game Boy game by Remy Sharp.">
+    <meta property="og:image" content="screenshots/03_normal_mode.png">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="screenshots/01_splash.png">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+
+  <body class="page-home">
+    <div class="wrap">
+
+      <header class="top">
+        <div class="brand" aria-label="Marbles 2">Marbles<sup>2</sup></div>
+        <nav>
+          <a href="#download">Download</a>
+          <a href="#play">How to play</a>
+          <a href="#share">Share scores</a>
+          <a href="#scores">High scores</a>
+        </nav>
+      </header>
+
+      <div class="grid">
+
+        <main>
+          <h1>Marbles<sup>2</sup></h1>
+          <p class="tagline">A tiny puzzler for the Game Boy. Clear the board, race the timer, chase a high score.</p>
+
+          <h2>The idea</h2>
+          <p>A 10×8 grid is dealt with four types of marble: plain, ringed, diamond, and striped. Move the cursor over a
+            group of touching same-type marbles and press <kbd>A</kbd> — the whole group floods and clears. Gravity
+            drops what's left, empty columns slide to the left, and you do it again until the board is empty.</p>
+
+          <h2>The goal</h2>
+          <p>Empty the grid while the bonus timer is still ticking. A clear of <em>n</em> marbles scores <em>n²</em>, so
+            big groups pay off super-linearly — an 8-clear is worth 64, two 4-clears are worth 32 combined. Wipe the
+            whole board before the timer drains and you pocket a +250 bonus.</p>
+          <p>There are two modes: <strong>NORMAL</strong> (10×8, four types, 30-second bonus, undos, a store) and
+            <strong>FAST</strong> (7×7, three types, 10-second bonus, no safety nets). Each has its own high-score slot,
+            saved to battery-backed cartridge SRAM.
+          </p>
+
+          <h2>Techniques</h2>
+          <ul>
+            <li>Don't grab the biggest group first — it's a trap. A smaller, smarter move usually leaves the board
+              healthier.</li>
+            <li>Watch out for lonely marbles. A marble with no same-colour neighbours is almost impossible to clear.
+            </li>
+            <li>Shrink the board toward <em>one colour</em>. Kill the rarest type first, then the next-rarest.</li>
+            <li>Keep plenty of moves on the board. If your next clear leaves only one or two options, think twice.</li>
+            <li>Look one move ahead — picture gravity and column-slide before you commit.</li>
+          </ul>
+          <p><a href="./player-guide.html">More tactics →</a></p>
+
+          <h2 id="download">Download</h2>
+          <p>A single 32KB ROM. Runs on any Game Boy emulator, flashcart, or real DMG/GBC/GBA.</p>
+          <div class="buttons">
+            <a class="btn" href="https://remysharp.itch.io/gb-marbles">
+              Download ROM
+              <small>gb-marbles.gb · 32 KB</small>
+            </a>
+          </div>
+          <p class="meta">Recommended emulators: <a href="https://sameboy.github.io/">SameBoy</a>, <a
+              href="https://bgb.bircd.org/">BGB</a>, or load it into a web emulator like <a
+              href="https://binji.github.io/binjgb/">GameBoy Online</a>.</p>
+
+          <h2 id="share">Sharing scores &amp; boards</h2>
+          <p>Every board is generated from a 16-bit <strong>seed</strong>, shown as <code>#NNNN</code> on the pause
+            screen and slowly revealed under the bonus bar as it drains. Same seed + same mode = identical layout. That
+            makes runs easy to share:</p>
+          <div class="seed-example">try #007A on NORMAL — I got 2,480</div>
+          <p>From the main menu, pick <strong>SET SEED</strong>, type the four hex digits, and you're playing the same
+            board as your friend.</p>
+
+          <p><strong>Share a save file.</strong> High scores live in the cartridge's battery-backed SRAM. Most emulators
+            write this to a <code>.sav</code> file next to the ROM. To share a run, send the <code>.sav</code> — the
+            recipient drops it in alongside their copy of <code>gb-marbles.gb</code> (same filename stem) and the high
+            score, initials, seed, and level are all there.</p>
+          <p>You can submit you high score to the global leaderboard by uploading your <code>.sav</code> on the <a
+              href="submit-highscore.html">submission page</a>.
+          </p>
+
+          <h2 id="play">Controls</h2>
+          <ul>
+            <li><kbd>D-pad</kbd> — move cursor</li>
+            <li><kbd>A</kbd> — flood-clear a group, or use an armed item</li>
+            <li><kbd>B</kbd> — undo (NORMAL) or cancel an armed item</li>
+            <li><kbd>START</kbd> — pause</li>
+            <li><kbd>SELECT</kbd> — open the STORE (NORMAL only)</li>
+          </ul>
+
+          <h2 id="credits">Credits</h2>
+          <p>Built by <a href="https://remysharp.com">Remy Sharp</a> with <a
+              href="https://github.com/gbdk-2020/gbdk-2020">GBDK-2020</a>. Fonts by <a
+              href="https://damieng.com/typography/zx-origins/">DamienG</a>. Originally a Palm Pilot game written in
+            2002, rebuilt for the Game Boy in 2026.</p>
+          <p>If you need some retro hardware, a Game Boy or more, check out <a href="https://retrobyrem.uk"
+              class="retro-link"><strong>retrobyrem.uk →</strong></a></p>
+        </main>
+
+        <aside class="shots">
+          <figure class="shot">
+            <img src="screenshots/01_splash.png" alt="Marbles² splash screen" width="480" height="432">
+            <figcaption>Title</figcaption>
+          </figure>
+
+          <div class="shot-row">
+            <figure class="shot">
+              <img src="screenshots/02_menu.png" alt="Main menu" width="480" height="432">
+              <figcaption>Menu</figcaption>
+            </figure>
+            <figure class="shot">
+              <img src="screenshots/03_normal_mode.png" alt="NORMAL mode gameplay" width="480" height="432">
+              <figcaption>Normal</figcaption>
+            </figure>
+          </div>
+
+          <div class="shot-row">
+            <figure class="shot">
+              <img src="screenshots/06_fast_mode.png" alt="FAST mode gameplay" width="480" height="432">
+              <figcaption>Fast</figcaption>
+            </figure>
+            <figure class="shot">
+              <img src="screenshots/04_store.png" alt="In-game store" width="480" height="432">
+              <figcaption>Store</figcaption>
+            </figure>
+          </div>
+
+          <div class="shot-row">
+            <figure class="shot">
+              <img src="screenshots/05_pause_seed.png" alt="Pause screen showing the board seed" width="480"
+                height="432">
+              <figcaption>Seed</figcaption>
+            </figure>
+            <figure class="shot">
+              <img src="screenshots/07_high_scores.png" alt="High score table" width="480" height="432">
+              <figcaption>Scores</figcaption>
+            </figure>
+          </div>
+        </aside>
+
+      </div>
+
+      <section class="leaderboards" id="scores">
+        <header>
+          <h2>High scores</h2>
+          <div class="sub"><a href="submit-highscore.html">Submit your score →</a> Upload your <code>.sav</code>, your
+            run gets re-simulated, and if it checks out it appears here.</div>
+        </header>
+
+        <div class="board-grid">
+
+          <div class="board">
+            <h3>Normal</h3>
+            <table class="scores">
+              <thead>
+                <tr>
+                  <th class="num">#</th>
+                  <th>Initials</th>
+                  <th class="num">Score</th>
+                  <th>Seed</th>
+                  <th class="num">Lvl</th>
+                  <th>Country</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- SCORES:NORMAL:START -->
+                <tr class="empty">
+                  <td colspan="6">— awaiting first entry —</td>
+                </tr>
+                <!-- SCORES:NORMAL:END -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="board">
+            <h3>Fast</h3>
+            <table class="scores">
+              <thead>
+                <tr>
+                  <th class="num">#</th>
+                  <th>Initials</th>
+                  <th class="num">Score</th>
+                  <th>Seed</th>
+                  <th class="num">Lvl</th>
+                  <th>Country</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- SCORES:FAST:START -->
+                <tr>
+                  <td class="rank num">1</td>
+                  <td class="initials">DAD</td>
+                  <td class="num">2,888</td>
+                  <td>#14E6</td>
+                  <td class="num">3</td>
+                  <td class="flag" title="GB">🇬🇧</td>
+                </tr>
+                <!-- SCORES:FAST:END -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+      <footer>
+        <div>© Remy Sharp · Marbles² is available on <a href="https://remysharp.itch.io/gb-marbles">itch.io</a>.</div>
+        <div class="retro"><a href="https://retrobyrem.uk">retrobyrem.uk →</a></div>
+      </footer>
+
+    </div>
+  </body>
+
+</html>

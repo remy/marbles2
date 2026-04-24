@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Marbles² — pick your platform</title>
+    <meta name="description"
+      content="Marbles² is a colour-matching puzzler ported across four generations of hardware: Palm Pilot, iPhone, ZX Spectrum, and Game Boy.">
+    <meta property="og:title" content="Marbles² — pick your platform">
+    <meta property="og:description" content="A colour-matching puzzler across four generations of hardware.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="gameboy/screenshots/demo.jpg">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+
+  <body>
+    <main class="wrap">
+
+      <header class="intro">
+        <h1>Marbles<sup>2</sup></h1>
+        <p class="tagline">One puzzle, four platforms. Clear the board by matching touching same-colour marbles — pick
+          the hardware that takes you back.</p>
+      </header>
+
+      <ul class="versions">
+
+        <li class="card">
+          <a class="shot" href="gameboy/" aria-label="Play the Game Boy version">
+            <img src="gameboy/screenshots/demo.jpg" alt="Marbles² running on a Game Boy" loading="lazy">
+          </a>
+          <div class="meta">
+            <h2><a href="gameboy/">Game Boy</a></h2>
+            <p class="platform">Homebrew ROM · 1989 hardware</p>
+            <p>A proper Game Boy build with a normal mode, a timed fast mode, seed-based runs and a worldwide high-score
+              table. Play in an emulator or on real hardware.</p>
+            <p class="links">
+              <a href="gameboy/">Open</a>
+              <a href="gameboy/player-guide.html">Player guide</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="card">
+          <a class="shot" href="spectrum/" aria-label="Play the ZX Spectrum version">
+            <img src="spectrum/screenshots/cover.png" alt="Marbles² running on a ZX Spectrum" loading="lazy"
+              onerror="this.closest('.shot').classList.add('no-shot')">
+          </a>
+          <div class="meta">
+            <h2><a href="spectrum/">ZX Spectrum Next</a></h2>
+            <p class="platform">Modern 8-bit revival · 256-colour palette</p>
+            <p>Built for the Spectrum Next — the 2020s reimagining of the classic Speccy. Crisper palette, proper sound,
+              world leaderboard. Runs in-browser via emulator.</p>
+            <p class="links">
+              <a href="spectrum/">Open</a>
+              <a href="spectrum/about.html">About this build</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="card">
+          <a class="shot" href="mobile/" aria-label="Play the mobile version">
+            <img src="mobile/screenshots/cover.avif" class="contain" alt="Marbles² running on an iPhone" loading="lazy"
+              onerror="this.closest('.shot').classList.add('no-shot')">
+          </a>
+          <div class="meta">
+            <h2><a href="mobile/">Mobile</a></h2>
+            <p class="platform">Early iPhone webapp · circa 2009</p>
+            <p>A touch-first HTML build from the first wave of iPhone webapps. Open it on a phone for the intended feel,
+              or play on desktop with a click.</p>
+            <p class="links">
+              <a href="mobile/">Open</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="card">
+          <a class="shot" href="palm/" aria-label="Play the Palm Pilot version">
+            <img src="palm/screenshots/cover.png" alt="Marbles² running on a Palm Pilot" loading="lazy"
+              onerror="this.closest('.shot').classList.add('no-shot')">
+          </a>
+          <div class="meta">
+            <h2><a href="palm/">Palm Pilot</a></h2>
+            <p class="platform">Palm OS PRC · 160×160 greyscale</p>
+            <p>The original Marbles² from the PDA era, running here in a CloudpilotEmu WebAssembly Palm emulator.
+              Tap-stylus puzzling at its finest.</p>
+            <p class="links">
+              <a href="palm/">Open</a>
+              <a href="palm/marbles2.prc" download>Download PRC</a>
+            </p>
+          </div>
+        </li>
+
+      </ul>
+
+      <footer class="foot">
+        <p>Marbles<sup>2</sup> by <a href="https://remysharp.com">Remy Sharp</a> · <a
+            href="https://github.com/remy/marbles2">source on GitHub</a></p>
+      </footer>
+
+    </main>
+  </body>
+
+</html>

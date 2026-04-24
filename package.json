@@ -2,10 +2,8 @@
   "name": "marbles2",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ."
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -22,8 +20,6 @@
   },
   "homepage": "https://github.com/remy/marbles2#readme",
   "dependencies": {
-    "axios": "^0.21.1",
-    "esm": "^3.2.25",
-    "st": "^1.1.0"
+    "postgres": "^3.4.4"
   }
 }

@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Marbles² — Player Guide</title>
+    <meta name="description"
+      content="Complete player guide for Marbles², a Game Boy puzzler. Controls, scoring, the store, seeds, and strategy tips.">
+    <meta property="og:title" content="Marbles² — Player Guide">
+    <meta property="og:description"
+      content="Controls, scoring, the store, seeds, and strategy tips for Marbles² on the Game Boy.">
+    <meta property="og:image" content="screenshots/03_normal_mode.png">
+    <meta property="og:type" content="article">
+    <link rel="icon" href="screenshots/01_splash.png">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+
+  <body class="page-guide">
+    <div class="wrap">
+
+      <header class="top">
+        <div class="brand"><a href="./index.html" aria-label="Marbles 2 — home">Marbles<sup>2</sup></a></div>
+        <nav>
+          <a href="index.html">← Home</a>
+          <a href="https://remysharp.itch.io/gb-marbles">Download ROM</a>
+        </nav>
+      </header>
+
+      <h1>Player Guide</h1>
+      <p class="tagline">A Game Boy puzzler where you clear a board of coloured marbles by flooding groups of touching
+        same-colour blocks. Empty the grid, beat the timer, rack up a high score, and keep your run alive with a small
+        in-game economy of bombs, paint, and undos.</p>
+
+      <figure class="shot">
+        <img src="screenshots/01_splash.png" alt="Marbles² splash screen" width="480" height="432">
+        <figcaption>Splash screen</figcaption>
+      </figure>
+
+      <h2>The main menu</h2>
+
+      <figure class="shot">
+        <img src="screenshots/02_menu.png" alt="Main menu" width="480" height="432">
+        <figcaption>Main menu</figcaption>
+      </figure>
+
+      <p>Five options, d-pad up/down to move the cursor, <kbd>A</kbd> or <kbd>START</kbd> to select:</p>
+
+      <ul>
+        <li><strong>NORMAL</strong> — the main game (10×8 grid, four block types).</li>
+        <li><strong>FAST MODE</strong> — a smaller, faster variant (7×7 grid, three block types).</li>
+        <li><strong>SET SEED</strong> — type in a four-digit hex seed to play a specific board.</li>
+        <li><strong>HIGH SCORE</strong> — view the top score per mode and replay it with one button.</li>
+        <li><strong>ABOUT</strong> — credits.</li>
+      </ul>
+
+      <p>The cursor remembers where you left it, so popping into HIGH SCORE or ABOUT and pressing <kbd>B</kbd> drops you
+        back on the same menu item.</p>
+
+      <h2>Game modes</h2>
+
+      <h3>NORMAL</h3>
+
+      <figure class="shot">
+        <img src="screenshots/03_normal_mode.png" alt="NORMAL mode gameplay" width="480" height="432">
+        <figcaption>NORMAL mode</figcaption>
+      </figure>
+
+      <ul>
+        <li><strong>Grid:</strong> 10 columns × 8 rows, four block types (plain, ringed, diamond, striped).</li>
+        <li><strong>Bag dealer:</strong> every board is dealt from a Fisher-Yates-shuffled bag of exactly 20 of each
+          block type — so you always get the same distribution, just in a different layout.</li>
+        <li><strong>Bonus timer:</strong> 30 seconds (1,800 frames). The "BONUS POINTS" bar across the bottom drains
+          left-to-right.</li>
+        <li><strong>Undo:</strong> 3 free undos per level, pushed automatically before every clear and every bomb/paint.
+          Press <kbd>B</kbd> to pop one. You can refill the credit pool in the STORE.</li>
+        <li><strong>Store:</strong> available via <kbd>SELECT</kbd> during play, or from the PAUSE menu, or when the "NO
+          MOVES LEFT" lifeline fires.</li>
+        <li><strong>Lifeline:</strong> if you run out of moves but have enough points to buy <em>anything</em>, the game
+          offers you one last trip to the store before it's over.</li>
+      </ul>
+
+      <h3>FAST MODE</h3>
+
+      <figure class="shot">
+        <img src="screenshots/06_fast_mode.png" alt="FAST mode gameplay" width="480" height="432">
+        <figcaption>FAST mode</figcaption>
+      </figure>
+
+      <ul>
+        <li><strong>Grid:</strong> 7 columns × 7 rows, only three block types.</li>
+        <li><strong>Bag dealer:</strong> purely random per cell (no shuffled bag) — every cell is rolled independently.
+        </li>
+        <li><strong>Bonus timer:</strong> 10 seconds (600 frames). Much tighter than NORMAL.</li>
+        <li><strong>Undo:</strong> none.</li>
+        <li><strong>Store:</strong> none.</li>
+        <li><strong>Lifeline:</strong> none — no moves, game over.</li>
+        <li><strong>Vibe:</strong> a pure reflex score attack. No safety nets. Fewer colours means bigger groups and
+          bigger payouts, but also more likely to strand you.</li>
+      </ul>
+
+      <h3>Side-by-side</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>NORMAL</th>
+              <th>FAST MODE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Grid</td>
+              <td>10 × 8</td>
+              <td>7 × 7</td>
+            </tr>
+            <tr>
+              <td>Block types</td>
+              <td>4</td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <td>Bonus timer</td>
+              <td>30 s</td>
+              <td>10 s</td>
+            </tr>
+            <tr>
+              <td>Undo</td>
+              <td>3 per level (refillable)</td>
+              <td>✗</td>
+            </tr>
+            <tr>
+              <td>Store</td>
+              <td>✓</td>
+              <td>✗</td>
+            </tr>
+            <tr>
+              <td>Lifeline</td>
+              <td>✓</td>
+              <td>✗</td>
+            </tr>
+            <tr>
+              <td>Seed display</td>
+              <td>Revealed under bonus bar</td>
+              <td>Revealed under bonus bar</td>
+            </tr>
+            <tr>
+              <td>High score</td>
+              <td>Separate NORMAL leaderboard</td>
+              <td>Separate FAST leaderboard</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>How to play</h2>
+
+      <ol>
+        <li><strong>Move the cursor</strong> with the d-pad (with auto-repeat if you hold).</li>
+        <li><strong>Press <kbd>A</kbd></strong> over a block to flood-fill its connected group. If the group has
+          <strong>2 or more</strong> blocks, they all clear at once. A single isolated block is not clearable.
+        </li>
+        <li><strong>Gravity</strong> drops the surviving blocks down into the empty space.</li>
+        <li><strong>Compaction</strong> then shifts whole empty columns to the left so there are no gaps.</li>
+        <li><strong>Score</strong> for a clear of <code>n</code> blocks is <code>n × n</code>. Bigger groups scale
+          super-linearly — a 10-clear (100 pts) is worth more than two 5-clears (25 + 25 = 50).</li>
+        <li><strong>Level clear bonus:</strong> clearing the entire board with bonus timer still running gives
+          <strong>+250 pts</strong>.
+        </li>
+      </ol>
+
+      <h2>Pausing</h2>
+
+      <figure class="shot">
+        <img src="screenshots/08_fast_pause.png" alt="Pause overlay" width="480" height="432">
+        <figcaption>Pause menu</figcaption>
+      </figure>
+
+      <p>Press <kbd>START</kbd> at any time to pause. The bonus timer stops and the overlay offers:</p>
+
+      <ul>
+        <li><strong>RESUME</strong> — back to play.</li>
+        <li><strong>STORE</strong> (NORMAL only) — open the shop without burning your <kbd>SELECT</kbd> shortcut.</li>
+        <li><strong>RESTART</strong> — replay the same seed from scratch. Useful if an early move cost you the round.
+        </li>
+        <li><strong>QUIT</strong> — bail back to the main menu.</li>
+      </ul>
+
+      <h2>The STORE (NORMAL only)</h2>
+
+      <figure class="shot">
+        <img src="screenshots/04_store.png" alt="In-game store" width="480" height="432">
+        <figcaption>Store</figcaption>
+      </figure>
+
+      <p>Open with <kbd>SELECT</kbd> during play, or from the <strong>PAUSE → STORE</strong> menu item, or via the
+        <strong>NO MOVES LEFT</strong> lifeline.
+      </p>
+
+      <p>While the store is open or an item is armed, the bonus timer is paused so you can think.</p>
+
+      <h3>Items</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>1st buy</th>
+              <th>2nd buy</th>
+              <th>3rd+ buys</th>
+              <th>What it does</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>BOMB</strong></td>
+              <td><strong>100</strong> pts</td>
+              <td><strong>250</strong> pts</td>
+              <td>500 pts</td>
+              <td>Clear one single cell (ignores the "minimum group of 2" rule)</td>
+            </tr>
+            <tr>
+              <td><strong>PAINT</strong></td>
+              <td>250 pts</td>
+              <td>250 pts</td>
+              <td>250 pts</td>
+              <td>Recolour one cell — great for connecting two almost-matching groups</td>
+            </tr>
+            <tr>
+              <td><strong>SHAKE</strong></td>
+              <td>500 pts</td>
+              <td>500 pts</td>
+              <td>500 pts</td>
+              <td>Fisher-Yates reshuffle every remaining block on the board</td>
+            </tr>
+            <tr>
+              <td><strong>UNDO</strong></td>
+              <td>500 pts</td>
+              <td>500 pts</td>
+              <td>500 pts</td>
+              <td>Refill one undo credit (capped at 3 held)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>BOMB</strong> uses a three-tier price ramp per game: 100 pts for your first buy, 250 pts for the
+        second, and 500 pts from the third onward.</p>
+
+      <p>The hint line at the bottom of the store shows <strong>A:BUY</strong> when you don't own any of the highlighted
+        item, and <strong>A:USE</strong> when you have at least one in your inventory. Bought items with a nonzero count
+        show an <code>X N</code> suffix (e.g. <code>BOMB 500 X2</code> means you currently hold two bombs).</p>
+
+      <p>Unaffordable items are rendered dim. If you hold an item already, the row stays bright because the "USE" action
+        is free.</p>
+
+      <h3>Using armed items</h3>
+
+      <p>When you buy or select BOMB or PAINT, the cursor changes to a thick frame to show you're "armed". Move with the
+        d-pad to target a cell, then:</p>
+
+      <ul>
+        <li><strong>BOMB</strong> — <kbd>A</kbd> obliterates just that one cell. Great for breaking up a stuck
+          single-block island.</li>
+        <li><strong>PAINT</strong> — <kbd>A</kbd> selects the cell, then the d-pad <strong>cycles the colour in
+            place</strong> (right/down = next colour, left/up = previous). A second <kbd>A</kbd> press commits the new
+          colour. <kbd>B</kbd> reverts it without spending the paint.</li>
+      </ul>
+
+      <p><strong><kbd>B</kbd> at any time</strong> cancels an armed item. If cancelling leaves the board with no moves,
+        the game ends — there's no infinite "arm and cancel" trick to stall out.</p>
+
+      <h3>SHAKE</h3>
+
+      <p>SHAKE is applied immediately — no targeting step. Every remaining block is scattered into a new random layout,
+        the board settles with gravity+compaction, and play resumes. Useful when you're stuck but the board still has
+        most of its blocks.</p>
+
+      <h3>UNDO (refill)</h3>
+
+      <p>UNDO doesn't trigger an undo directly — it refills one undo credit into your pool, up to the cap of 3 held.
+        Press <kbd>B</kbd> on the board to actually spend a credit and rewind.</p>
+
+      <h2>Seeds</h2>
+
+      <p>Every board is generated from a 16-bit <strong>seed</strong> shown as <code>#NNNN</code> in lowercase hex. Same
+        seed → same board (same level progression, same dealt bag order).</p>
+
+      <figure class="shot">
+        <img src="screenshots/05_pause_seed.png" alt="Seed revealed under the bonus bar" width="480" height="432">
+        <figcaption>Seed on bonus bar</figcaption>
+      </figure>
+
+      <p>As the bonus timer drains right-to-left, the seed (<code>#NNNN</code>) is gradually revealed underneath it.
+        Race the timer to deny your opponent a peek — at the start of a level, only the <code>#</code> prefix is
+        visible; by the time the bar is empty, the full four-digit seed is on display.</p>
+
+      <h3>Entering a seed manually</h3>
+
+      <p>From the main menu, <strong>SET SEED</strong> opens a 4-digit hex entry screen. You pick NORMAL or FAST, type
+        the seed, and press <kbd>START</kbd> to play. Useful for sharing boards with friends
+        (<code>"try #007A on NORMAL"</code>) or rerunning a run that went well.</p>
+
+      <h3>Why seeds matter</h3>
+
+      <ul>
+        <li><strong>Replay a run you liked</strong> — hit RESTART from pause, or enter the seed from the menu.</li>
+        <li><strong>Share boards</strong> — same seed + mode = identical layout on any copy of the game.</li>
+        <li><strong>Challenge runs</strong> — pick a specific seed and try to beat your own score on it.</li>
+        <li><strong>High score replays</strong> — the high score screen remembers the seed and lets you replay it
+          directly.</li>
+      </ul>
+
+      <h2>High scores</h2>
+
+      <figure class="shot">
+        <img src="screenshots/07_high_scores.png" alt="High score table" width="480" height="432">
+        <figcaption>High scores</figcaption>
+      </figure>
+
+      <ul>
+        <li><strong>One entry per mode</strong> (NORMAL and FAST have independent leaderboards).</li>
+        <li><strong>Saved to cartridge SRAM</strong> — battery-backed, survives power off. A fresh cart shows
+          <code>???&nbsp;&nbsp;0</code> for both entries.
+        </li>
+        <li><strong>When you beat the current high score</strong>, a "NEW HIGH SCORE" banner slides up on the window
+          layer during play. Your eventual final score is checked against the saved entry on game over, and if it still
+          qualifies you're asked to enter your initials (three letters).</li>
+        <li><strong>The entry stores</strong>: your initials, the final score, the seed you played, and the level you
+          reached.</li>
+        <li><strong>Replay a high score</strong>: from the high score table screen, pick an entry and press <kbd>A</kbd>
+          to start a new game on that seed in the matching mode. Your score resets but the board layout is identical — a
+          good way to learn from a strong run.</li>
+      </ul>
+
+      <h2>Tips</h2>
+
+      <ul>
+        <li><strong>Bigger groups, more points</strong>: a single clear of 8 is worth <code>8 × 8 = 64</code> pts, while
+          two clears of 4 are worth <code>2 × 16 = 32</code> pts for the same blocks. Patience beats twitch.</li>
+        <li><strong>Clear small isolated groups last</strong>: gravity and compaction can merge bigger groups together
+          if you clear surrounding blocks first.</li>
+        <li><strong>Race the timer on NORMAL</strong>: +250 pts for level clearing with time left is a nice bonus that
+          rewards quick play.</li>
+        <li><strong>Save your first bomb</strong>: at 100 pts it's basically free. The second one doubles to 250, and
+          everything after that is 500 — so pick spots that really unlock the board.</li>
+        <li><strong>Paint is underrated</strong>: two adjacent 2-cell groups of different colours turn into a 4-cell
+          group worth <code>16</code> pts instead of <code>2 × 4 = 8</code> pts — and you break up whatever was blocking
+          the connection.</li>
+        <li><strong>SHAKE is an emergency tool</strong>: 500 pts is a lot, but it's also "still playing" vs "game over".
+        </li>
+        <li><strong>Undo refills stack</strong>: if you blow all three undos and still have points, buy a refill from
+          the store and keep rewinding.</li>
+      </ul>
+
+      <h2>Controls reference</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Button</th>
+              <th>Gameplay</th>
+              <th>Menus</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><kbd>D-pad</kbd></td>
+              <td>Move cursor / paint-cycle colour</td>
+              <td>Move cursor</td>
+            </tr>
+            <tr>
+              <td><kbd>A</kbd></td>
+              <td>Clear group / use armed item</td>
+              <td>Select</td>
+            </tr>
+            <tr>
+              <td><kbd>B</kbd></td>
+              <td>Undo (NORMAL) / cancel armed</td>
+              <td>Back</td>
+            </tr>
+            <tr>
+              <td><kbd>START</kbd></td>
+              <td>Pause menu</td>
+              <td>Select (on main menu)</td>
+            </tr>
+            <tr>
+              <td><kbd>SELECT</kbd></td>
+              <td>Open STORE (NORMAL)</td>
+              <td>Cycle cursor down (on pause)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="colophon">Marbles² is a Game Boy port of a Palm Pilot game originally written in 2002. Fonts by <a
+          href="https://damieng.com/typography/zx-origins/">DamienG</a>. Written by <a href="https://remysharp.com">Remy
+          Sharp</a> — more at <a href="https://retrobyrem.uk">retrobyrem.uk</a>.</p>
+
+      <footer>
+        <div>© Remy Sharp · <a href="index.html">Back to home</a></div>
+        <div class="retro"><a href="https://retrobyrem.uk">retrobyrem.uk →</a></div>
+      </footer>
+
+    </div>
+  </body>
+
+</html>

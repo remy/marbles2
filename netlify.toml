@@ -1,3 +1,16 @@
 [build]
-  functions = "functions" #  netlify-lambda reads this
-  publish = "app"
+functions = "netlify/functions"
+publish = "public"
+
+[functions]
+node_bundler = "esbuild"
+
+[[redirects]]
+from = "/scores"
+to = "/.netlify/functions/scores"
+status = 200
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/api/:splat"
+status = 200

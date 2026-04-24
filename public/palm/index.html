@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Marbles² on the Palm Pilot</title>
+    <script src="cloudpilot-emu.js"></script>
+    <style>
+      :root {
+        --bg: #1b1d22;
+        --ink: #e8e9ee;
+        --ink-dim: #a0a4b0;
+        --accent: #ffd166;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-align: center;
+      }
+
+      h1 {
+        font-weight: 600;
+        font-size: 1.4rem;
+        letter-spacing: -0.01em;
+        margin: 1.25rem 0 1rem;
+      }
+
+      h1 sup {
+        color: var(--accent);
+        font-size: 0.6em;
+        top: -0.55em;
+      }
+
+      canvas {
+        width: 100%;
+        height: calc(100vh - 8em);
+        margin-bottom: 1em;
+      }
+
+      canvas:focus {
+        border: none;
+        outline: none;
+      }
+
+      a {
+        margin: 0 0.5em;
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover { text-decoration: underline; }
+    </style>
+  </head>
+
+  <body>
+    <h1>Marbles<sup>2</sup> on the Palm Pilot</h1>
+    <canvas tabindex="1"></canvas>
+
+    <script>
+      (async function () {
+        const sessionResponse = await fetch('session.img');
+        if (!sessionResponse.ok) {
+          throw new Error('could not download session file');
+        }
+
+        const session = await sessionResponse.arrayBuffer();
+
+        const prcResponse = await fetch('marbles2.prc');
+        if (!prcResponse.ok) {
+          throw new Error('could not download prc file');
+        }
+
+        const prc = await prcResponse.arrayBuffer();
+
+        const emulator = await cloudpilot.createEmulator();
+        const canvas = document.getElementsByTagName('canvas')[0];
+
+        await emulator.loadSession(new Uint8Array(session));
+        await emulator.installAndLaunchDatabase(new Uint8Array(prc));
+
+        emulator.setCanvas(canvas);
+        emulator.bindInput(canvas);
+
+        await emulator.resume();
+      })().catch((e) => console.error(e));
+    </script>
+  </body>
+
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Marbles² — Submit a high score</title>
+    <meta name="description"
+      content="Upload your Marbles² save file, validate your run, and add it to the public leaderboard.">
+    <meta property="og:title" content="Marbles² — Submit a high score">
+    <meta property="og:description" content="Upload your Marbles² save file to add your run to the leaderboard.">
+    <meta property="og:image" content="screenshots/07_high_scores.png">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="screenshots/01_splash.png">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+
+  <body class="page-submit">
+    <div class="wrap">
+
+      <header class="top">
+        <div class="brand"><a href="index.html" aria-label="Marbles 2 — home">Marbles<sup>2</sup></a></div>
+        <nav>
+          <a href="index.html">← Home</a>
+          <a href="index.html#scores">High scores</a>
+        </nav>
+      </header>
+
+      <h1>Submit a high score</h1>
+      <p class="tagline">Drop your <code>.sav</code> or <code>.srm</code> file. Your run is re-simulated from the stored
+        seed — if the final score checks out, it goes on the public leaderboard.</p>
+
+      <section id="section-idle">
+        <label class="drop" id="drop">
+          <div class="big">Drop your save file here</div>
+          <div class="hint"><code>.sav</code> · <code>.srm</code></div>
+          <input type="file" id="file-input" accept=".sav,.srm,application/octet-stream">
+          <div><button type="button" id="pick-btn">Pick a file…</button></div>
+        </label>
+        <p class="status-line" id="parse-error" role="alert"></p>
+      </section>
+      <p class="note">Note: if you're using an Everdrive, you need to switch ROMs before the save game file is saved to
+        the SDCARD.</p>
+
+      <section id="section-parsed" class="hidden">
+        <h2>Parsed</h2>
+        <div class="cards" id="cards"></div>
+
+        <div class="form-row">
+          <label for="country">Country</label>
+          <input type="text" id="country" list="countries" autocomplete="off" placeholder="e.g. GB" maxlength="64">
+          <datalist id="countries"></datalist>
+        </div>
+
+        <div class="submit-bar">
+          <button type="button" class="btn" id="submit-btn">Submit selected</button>
+          <span class="status-line" id="submit-status"></span>
+        </div>
+      </section>
+
+      <section id="section-done" class="hidden">
+        <div class="done-block" id="done-block"></div>
+        <p><a href="index.html#scores">← Back to leaderboard</a></p>
+      </section>
+
+      <footer>
+        <div>© Remy Sharp · <a href="index.html">Back to home</a></div>
+        <div class="retro"><a href="https://retrobyrem.uk">retrobyrem.uk →</a></div>
+      </footer>
+
+    </div>
+    <script type="module" src="submit/submit-highscore.js"></script>
+  </body>
+
+</html>
