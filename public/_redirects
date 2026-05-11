@@ -1,0 +1,2 @@
+/api/gameboy-highscore  https://raw.githubusercontent.com/remy/gb-marbles-highscores/main/scores.json  200!  Method=GET
+/api/gameboy-highscore  /.netlify/functions/gameboy-highscore  200!  Method=POST
