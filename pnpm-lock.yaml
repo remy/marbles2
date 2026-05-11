@@ -6,18 +6,4 @@ settings:
 
 importers:
 
-  .:
-    dependencies:
-      postgres:
-        specifier: ^3.4.4
-        version: 3.4.9
-
-packages:
-
-  postgres@3.4.9:
-    resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
-    engines: {node: '>=12'}
-
-snapshots:
-
-  postgres@3.4.9: {}
+  .: {}
