@@ -10,8 +10,19 @@ from = "/scores"
 to = "/.netlify/functions/scores"
 status = 200
 
+[[redirects]]
+from = "/api/gameboy-highscore"
+to = "/.netlify/functions/gameboy-highscore"
+status = 200
+
+[[redirects]]
+from = "/api/gameboy-highscores.json"
+to = "https://raw.githubusercontent.com/remy/gb-marbles-highscores/main/scores.json"
+status = 200
+force = true
+
 [[headers]]
-for = "/api/gameboy-highscore"
+for = "/api/gameboy-highscores.json"
 [headers.values]
 Cache-Control = "no-store, max-age=0"
 Netlify-CDN-Cache-Control = "no-store"
