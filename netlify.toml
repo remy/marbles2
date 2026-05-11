@@ -11,6 +11,26 @@ to = "/.netlify/functions/scores"
 status = 200
 
 [[redirects]]
+from = "/api/gameboy-highscore"
+to = "https://raw.githubusercontent.com/remy/gb-marbles-highscores/main/scores.json"
+status = 200
+force = true
+conditions = {Method = ["GET"]}
+
+[[redirects]]
+from = "/api/gameboy-highscore"
+to = "/.netlify/functions/gameboy-highscore"
+status = 200
+force = true
+conditions = {Method = ["POST"]}
+
+[[redirects]]
 from = "/api/*"
 to = "/.netlify/functions/api/:splat"
 status = 200
+
+[[headers]]
+for = "/api/gameboy-highscore"
+[headers.values]
+Cache-Control = "no-store, max-age=0"
+Netlify-CDN-Cache-Control = "no-store"

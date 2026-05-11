@@ -36,24 +36,8 @@ const SCORES_PATH = 'scores.json';
 const SUBMITTED_DIR = 'submitted';
 const TOP_N_PER_MODE = 50;
 const SCORES_PUT_MAX_ATTEMPTS = 4;
-const RAW_SCORES_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${SCORES_PATH}`;
-
-export const config = { path: '/api/gameboy-highscore' };
 
 export default async (req) => {
-  if (req.method === 'GET') {
-    try {
-      const upstream = await fetch(RAW_SCORES_URL, { cache: 'no-store' });
-      const text = await upstream.text();
-      return new Response(text, {
-        status: upstream.status,
-        headers: { 'content-type': 'application/json; charset=utf-8' },
-      });
-    } catch (e) {
-      return json(502, { ok: false, reason: `failed to fetch scores: ${e.message}` });
-    }
-  }
-
   if (req.method !== 'POST') {
     return json(405, { ok: false, reason: 'method not allowed' });
   }
