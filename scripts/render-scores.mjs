@@ -1,43 +1,35 @@
 #!/usr/bin/env node
 /**
- * Netlify build step: reads the `scores` Postgres table and inlines the
- * top-N entries for each mode into public/gameboy/index.html between:
+ * Netlify build step: reads scores.json from the public
+ * remy/gb-marbles-highscores repo and inlines the top-N entries for each
+ * mode into public/gameboy/index.html between:
  *   <!-- SCORES:NORMAL:START --> ... <!-- SCORES:NORMAL:END -->
  *   <!-- SCORES:FAST:START -->   ... <!-- SCORES:FAST:END -->
  *
- * Idempotent: re-running against the same DB state produces the same HTML.
- * When a mode has no entries, the "awaiting first entry" placeholder row
- * is rendered so the table never renders empty.
+ * Idempotent: re-running against the same upstream state produces the same
+ * HTML. When a mode has no entries, the "awaiting first entry" placeholder
+ * row is rendered so the table never renders empty.
  */
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import postgres from 'postgres';
 import { codeToFlag } from '../public/gameboy/submit/countries.js';
 
 const TOP_N = 10;
+const SCORES_URL = 'https://raw.githubusercontent.com/remy/gb-marbles-highscores/main/scores.json';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const INDEX_FILE = path.join(root, 'public/gameboy', 'index.html');
 
 async function fetchScores() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('missing DATABASE_URL');
-  const sql = postgres(url, { max: 1, idle_timeout: 5, prepare: false });
-  try {
-    const rows = await sql`
-      SELECT mode, initials, country, score, seed, level
-      FROM scores
-      WHERE mode IN ('normal', 'fast')
-      ORDER BY mode, score DESC
-    `;
-    const out = { normal: [], fast: [] };
-    for (const r of rows) out[r.mode]?.push(r);
-    return out;
-  } finally {
-    await sql.end({ timeout: 5 });
-  }
+  const res = await fetch(SCORES_URL, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`fetch scores.json → ${res.status} ${res.statusText}`);
+  const data = await res.json();
+  return {
+    normal: Array.isArray(data.normal) ? data.normal : [],
+    fast: Array.isArray(data.fast) ? data.fast : [],
+  };
 }
 
 async function main() {

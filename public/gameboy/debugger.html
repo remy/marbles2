@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>GB Block Placer</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: monospace;
+        background: #f0f0f0;
+        color: #222;
+        padding: 20px;
+      }
+
+      #simLog {
+        white-space: pre;
+      }
+
+      h1 {
+        margin-bottom: 12px;
+        font-size: 18px;
+        color: #336;
+      }
+
+      .top-row {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .editor-col {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .sim-col {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .editor-col>h2,
+      .sim-col>h2 {
+        font-size: 14px;
+        color: #555;
+        margin: 0;
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .controls label {
+        font-size: 13px;
+      }
+
+      .controls input[type=number] {
+        width: 46px;
+        background: #fff;
+        color: #222;
+        border: 1px solid #aaa;
+        padding: 2px 4px;
+        font-family: monospace;
+      }
+
+      .canvas-wrap {
+        position: relative;
+        display: inline-block;
+        border: 2px solid #999;
+        background: #222;
+        cursor: crosshair;
+        overflow: hidden;
+        box-sizing: content-box;
+      }
+
+      .canvas-wrap canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        image-rendering: pixelated;
+      }
+
+      .picker {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .picker-btn {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #bbb;
+        border-radius: 4px;
+        cursor: pointer;
+        image-rendering: pixelated;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #666;
+        position: relative;
+      }
+
+      .picker-btn.active {
+        border-color: #07f;
+        box-shadow: 0 0 6px rgba(0, 112, 255, 0.5);
+      }
+
+      .picker-btn canvas {
+        image-rendering: pixelated;
+      }
+
+      .picker-key {
+        font-size: 10px;
+        color: #999;
+        position: absolute;
+        bottom: 1px;
+        right: 3px;
+        pointer-events: none;
+      }
+
+      button {
+        background: #ddd;
+        color: #222;
+        border: 1px solid #aaa;
+        padding: 4px 12px;
+        cursor: pointer;
+        font-family: monospace;
+        border-radius: 3px;
+      }
+
+      button:hover {
+        background: #ccc;
+      }
+
+      .sim-info {
+        font-size: 12px;
+        color: #666;
+        display: flex;
+        height: 40px;
+        align-items: center;
+      }
+
+      textarea {
+        width: 100%;
+        max-width: 700px;
+        height: 180px;
+        background: #fff;
+        color: #333;
+        border: 1px solid #aaa;
+        padding: 8px;
+        font-family: monospace;
+        font-size: 12px;
+        margin-top: 12px;
+      }
+
+      .drop-hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #888;
+        font-size: 14px;
+        pointer-events: none;
+        text-align: center;
+      }
+
+      #dimensions:popover-open {
+        gap: 10px;
+        flex-wrap: wrap;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        border: 1px solid #aaa;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 6px;
+      }
+
+      [popover] {
+        margin: unset;
+        position-area: block-end span-inline-end;
+        /* or wherever you want it */
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>GB Block Placer</h1>
+
+    <div class="top-row">
+      <div class="editor-col">
+        <h2>Planner</h2>
+        <div class="controls">
+          <div class="dimensions" id="dimensions" popover>
+            <label>X: <input type="number" id="gridX" value="0" min="0" max="9"></label>
+            <label>Y: <input type="number" id="gridY" value="0" min="0" max="8"></label>
+            <label>W: <input type="number" id="cols" value="10" min="1" max="20"></label>
+            <label>H: <input type="number" id="rows" value="8" min="1" max="18"></label>
+          </div>
+          <button popovertarget="dimensions" id="dimsBtn">Dimensions</button>
+          <button id="clearBtn">Clear</button>
+          <button id="randomBtn">Random</button>
+        </div>
+        <div class="picker" id="picker"></div>
+        <div class="canvas-wrap" id="wrap">
+          <canvas id="bgCanvas"></canvas>
+          <canvas id="blockCanvas"></canvas>
+          <canvas id="hoverCanvas"></canvas>
+          <canvas id="gridCanvas"></canvas>
+          <div class="drop-hint" id="dropHint">Drop 160×144 PNG</div>
+        </div>
+        <textarea id="output"></textarea>
+      </div>
+
+      <div class="sim-col">
+        <h2>Simulator</h2>
+        <div class="controls">
+          <button id="simBtn">▶ Run</button>
+          <button id="simUndoBtn">⟲ Undo</button>
+          <button id="simResetBtn">↺ Reset</button>
+        </div>
+        <div class="sim-info" id="simInfo">Click ▶ Run to copy blocks and test clearing</div>
+        <div class="canvas-wrap" id="simWrap">
+          <canvas id="simBgCanvas"></canvas>
+          <canvas id="simBlockCanvas"></canvas>
+          <canvas id="simHoverCanvas"></canvas>
+        </div>
+        <output id="simLog" readonly rows="6" style="width:100%;max-width:324px;font-size:11px;margin-top:6px;">
+      </div>
+    </div>
+
+    <script>
+      const pretile = [
+        [[0xFF, 0xFF, 0xFF, 0x80, 0xFF, 0x81, 0xFE, 0x82, 0xFC, 0x84, 0xF8, 0x88, 0xF0, 0x90, 0xE0, 0xA0], [0xFF, 0xFF, 0xFF, 0x01, 0xFF, 0x81, 0x7F, 0x41, 0x3F, 0x21, 0x1F, 0x11, 0x0F, 0x09, 0x07, 0x05], [0xE0, 0xA0, 0xF0, 0x90, 0xF8, 0x88, 0xFC, 0x84, 0xFE, 0x82, 0xFF, 0x81, 0xFF, 0x80, 0xFF, 0xFF], [0x07, 0x05, 0x0F, 0x09, 0x1F, 0x11, 0x3F, 0x21, 0x7F, 0x41, 0xFF, 0x81, 0xFF, 0x01, 0xFF, 0xFF]],
+        [[0xFF, 0xFF, 0xFF, 0x80, 0xFF, 0xBF, 0xFF, 0xA0, 0xFF, 0xAF, 0xFF, 0xA8, 0xFC, 0xA8, 0xFC, 0xA8], [0xFF, 0xFF, 0xFF, 0x01, 0xFF, 0xFD, 0xFF, 0x05, 0xFF, 0xF5, 0xFF, 0x15, 0x3F, 0x15, 0x3F, 0x15], [0xFC, 0xA8, 0xFC, 0xA8, 0xFF, 0xA8, 0xFF, 0xAF, 0xFF, 0xA0, 0xFF, 0xBF, 0xFF, 0x80, 0xFF, 0xFF], [0x3F, 0x15, 0x3F, 0x15, 0xFF, 0x15, 0xFF, 0xF5, 0xFF, 0x05, 0xFF, 0xFD, 0xFF, 0x01, 0xFF, 0xFF]],
+        [[0xFF, 0xFF, 0xC0, 0xFF, 0xBF, 0xE6, 0xBF, 0xCC, 0xBF, 0xD9, 0xBF, 0xF3, 0xBF, 0xE6, 0xBF, 0xCC], [0xFF, 0xFF, 0x03, 0xFF, 0xFD, 0x67, 0xFD, 0xCF, 0xFD, 0x9B, 0xFD, 0x33, 0xFD, 0x67, 0xFD, 0xCF], [0xBF, 0xD9, 0xBF, 0xF3, 0xBF, 0xE6, 0xBF, 0xCC, 0xBF, 0xD9, 0xBF, 0xF3, 0xC0, 0xFF, 0xFF, 0xFF], [0xFD, 0x9B, 0xFD, 0x33, 0xFD, 0x67, 0xFD, 0xCF, 0xFD, 0x9B, 0xFD, 0x33, 0x03, 0xFF, 0xFF, 0xFF]],
+        [[0xFF, 0xFF, 0x80, 0x80, 0x80, 0x80, 0x81, 0x81, 0x82, 0x83, 0x84, 0x87, 0x88, 0x8F, 0x90, 0x9F], [0xFF, 0xFF, 0x01, 0x01, 0x01, 0x01, 0x81, 0x81, 0x41, 0xC1, 0x21, 0xE1, 0x11, 0xF1, 0x09, 0xF9], [0x90, 0x9F, 0x88, 0x8F, 0x84, 0x87, 0x82, 0x83, 0x81, 0x81, 0x80, 0x80, 0x80, 0x80, 0xFF, 0xFF], [0x09, 0xF9, 0x11, 0xF1, 0x21, 0xE1, 0x41, 0xC1, 0x81, 0x81, 0x01, 0x01, 0x01, 0x01, 0xFF, 0xFF]]
+      ];
+
+      const palette = ['#FFFFFF', '#AAAAAA', '#555555', '#000000'];
+      const SCALE = 2, TILE_PX = 16, CELL = TILE_PX * SCALE;
+      const GB_W = 160, GB_H = 144, SCR_W = GB_W * SCALE, SCR_H = GB_H * SCALE;
+
+      function decodeTile(d) {
+        const p = [];
+        for (let r = 0; r < 8; r++) { const lo = d[r * 2], hi = d[r * 2 + 1], l = []; for (let b = 7; b >= 0; b--) l.push(((hi >> b) & 1) << 1 | ((lo >> b) & 1)); p.push(l); }
+        return p;
+      }
+      function renderBlock(ti) {
+        const c = document.createElement('canvas'); c.width = 16; c.height = 16; const ctx = c.getContext('2d');
+        const q = pretile[ti], off = [[0, 0], [8, 0], [0, 8], [8, 8]];
+        for (let i = 0; i < 4; i++) { const px = decodeTile(q[i]), ox = off[i][0], oy = off[i][1]; for (let y = 0; y < 8; y++)for (let x = 0; x < 8; x++) { ctx.fillStyle = palette[px[y][x]]; ctx.fillRect(ox + x, oy + y, 1, 1); } }
+        return c;
+      }
+      const blockImg = [null, renderBlock(0), renderBlock(1), renderBlock(2), renderBlock(3)];
+
+      // ========== EDITOR ==========
+      let cols = 10, rows = 9, gridX = 0, gridY = 0, grid = [], activeTool = 0, painting = false, bgImage = null, hoverCell = null;
+
+      const bgCvs = document.getElementById('bgCanvas'), blkCvs = document.getElementById('blockCanvas'),
+        hovCvs = document.getElementById('hoverCanvas'), grdCvs = document.getElementById('gridCanvas'),
+        wrap = document.getElementById('wrap'), output = document.getElementById('output'),
+        dropHint = document.getElementById('dropHint');
+
+      function setupEditor() {
+        const gw = cols * CELL, gh = rows * CELL;
+        [bgCvs, blkCvs, hovCvs, grdCvs].forEach(c => { c.width = gw; c.height = gh; c.style.width = gw + 'px'; c.style.height = gh + 'px'; c.style.left = '0'; c.style.top = '0'; });
+        wrap.style.width = gw + 'px'; wrap.style.height = gh + 'px';
+        output.style.width = wrap.offsetWidth + 'px';
+      }
+      function updateDropHint() {
+        dropHint.style.display = (bgImage || grid.some(v => v !== 0)) ? 'none' : '';
+      }
+      function drawBg() {
+        const ctx = bgCvs.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.clearRect(0, 0, bgCvs.width, bgCvs.height);
+        if (bgImage) ctx.drawImage(bgImage, -gridX * CELL, -gridY * CELL, SCR_W, SCR_H);
+        updateDropHint();
+      }
+      function resetGrid() { grid = new Array(rows * cols).fill(0); edDraw(); updateOutput(); syncSim(); }
+      function edDraw() { drawEdBlocks(); drawEdHover(); drawEdGrid(); }
+      function drawEdBlocks() {
+        const ctx = blkCvs.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.clearRect(0, 0, blkCvs.width, blkCvs.height); ctx.globalAlpha = 0.75;
+        for (let r = 0; r < rows; r++)for (let c = 0; c < cols; c++) { const v = grid[r * cols + c]; if (v > 0 && v <= 4) ctx.drawImage(blockImg[v], c * CELL, r * CELL, CELL, CELL); }
+        ctx.globalAlpha = 1;
+        updateDropHint();
+      }
+      function drawEdGrid() {
+        const ctx = grdCvs.getContext('2d'); ctx.clearRect(0, 0, grdCvs.width, grdCvs.height); ctx.strokeStyle = 'rgba(0,255,255,0.4)'; ctx.lineWidth = 1;
+        for (let c = 0; c <= cols; c++) { ctx.beginPath(); ctx.moveTo(c * CELL + .5, 0); ctx.lineTo(c * CELL + .5, rows * CELL); ctx.stroke(); }
+        for (let r = 0; r <= rows; r++) { ctx.beginPath(); ctx.moveTo(0, r * CELL + .5); ctx.lineTo(cols * CELL, r * CELL + .5); ctx.stroke(); }
+      }
+      function drawEdHover() {
+        const ctx = hovCvs.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.clearRect(0, 0, hovCvs.width, hovCvs.height);
+        if (!hoverCell || activeTool === 0 || painting) return; const { r, c } = hoverCell; if (grid[r * cols + c] === activeTool) return;
+        ctx.globalAlpha = 0.5; ctx.drawImage(blockImg[activeTool], c * CELL, r * CELL, CELL, CELL); ctx.globalAlpha = 1;
+      }
+      let outputLock = false; // prevent feedback loop when user is typing
+      function updateOutput() {
+        if (outputLock) return;
+        const lines = []; for (let r = 0; r < rows; r++) { const v = []; for (let c = 0; c < cols; c++)v.push(grid[r * cols + c]); lines.push(v.join(', ')); }
+        output.value = lines.join(',\n');
+      }
+      function parseOutput() {
+        // Extract all integers from the textarea, fill grid left-to-right top-to-bottom
+        const nums = output.value.match(/-?\d+/g);
+        if (!nums) return;
+        const vals = nums.map(n => Math.max(0, Math.min(4, parseInt(n) || 0)));
+        for (let i = 0; i < grid.length; i++) grid[i] = (i < vals.length) ? vals[i] : 0;
+        edDraw(); syncSim();
+      }
+      output.addEventListener('input', () => { outputLock = true; parseOutput(); outputLock = false; });
+      output.addEventListener('paste', () => { setTimeout(() => { outputLock = true; parseOutput(); outputLock = false; }, 0); });
+      function edCell(e) { const rect = grdCvs.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top, c = Math.floor(x / CELL), r = Math.floor(y / CELL); return (c >= 0 && c < cols && r >= 0 && r < rows) ? { r, c } : null; }
+      function edApply(r, c) { if (grid[r * cols + c] !== activeTool) { grid[r * cols + c] = activeTool; drawEdBlocks(); drawEdHover(); updateOutput(); syncSim(); } }
+
+      grdCvs.addEventListener('mousedown', e => { const c = edCell(e); if (c) { painting = true; edApply(c.r, c.c); } });
+      grdCvs.addEventListener('mousemove', e => { const c = edCell(e); if (painting) { if (c) edApply(c.r, c.c); } else { const ch = !hoverCell || !c || hoverCell.r !== c.r || hoverCell.c !== c.c; if (ch) { hoverCell = c; drawEdHover(); } } });
+      grdCvs.addEventListener('mouseleave', () => { hoverCell = null; drawEdHover(); });
+      window.addEventListener('mouseup', () => { painting = false; drawEdHover(); });
+
+      function buildPicker() {
+        const pk = document.getElementById('picker'); pk.innerHTML = '';
+        const eb = document.createElement('div'); eb.className = 'picker-btn' + (activeTool === 0 ? ' active' : ''); eb.innerHTML = '✕<span class="picker-key">1</span>'; eb.title = 'Eraser [1]'; eb.onclick = () => { activeTool = 0; buildPicker(); }; pk.appendChild(eb);
+        for (let t = 1; t <= 4; t++) {
+          const b = document.createElement('div'); b.className = 'picker-btn' + (activeTool === t ? ' active' : ''); b.title = 'Block ' + t + ' [' + (t + 1) + ']';
+          const pv = document.createElement('canvas'); pv.width = 16; pv.height = 16; pv.style.width = '32px'; pv.style.height = '32px'; pv.style.imageRendering = 'pixelated'; const pc = pv.getContext('2d'); pc.imageSmoothingEnabled = false; pc.drawImage(blockImg[t], 0, 0); b.appendChild(pv);
+          const k = document.createElement('span'); k.className = 'picker-key'; k.textContent = t + 1; b.appendChild(k); b.onclick = () => { activeTool = t; buildPicker(); }; pk.appendChild(b);
+        }
+      }
+      window.addEventListener("keydown", (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+        if (e.altKey || e.metaKey || e.ctrlKey) return;
+        if (e.key >= "1" && e.key <= "5") {
+          activeTool = parseInt(e.key) - 1;
+          buildPicker();
+          e.preventDefault();
+        }
+      });
+
+
+      wrap.addEventListener('dragover', e => { e.preventDefault(); wrap.style.borderColor = '#07f'; });
+      wrap.addEventListener('dragleave', () => { wrap.style.borderColor = '#999'; });
+      wrap.addEventListener('drop', e => {
+        e.preventDefault(); wrap.style.borderColor = '#999'; const f = e.dataTransfer.files[0]; if (!f || !f.type.startsWith('image/')) return;
+        const reader = new FileReader(); reader.onload = ev => {
+          const dataUrl = ev.target.result; try { localStorage.setItem('gbplacer_bg', dataUrl); } catch (e) { }
+          const img = new Image(); img.onload = () => { bgImage = img; drawBg(); drawSimBg(); }; img.src = dataUrl;
+        }; reader.readAsDataURL(f);
+      });
+
+      function onParamChange() {
+        const nc = Math.max(1, Math.min(20, parseInt(document.getElementById('cols').value) || 10)), nr = Math.max(1, Math.min(18, parseInt(document.getElementById('rows').value) || 9));
+        const nx = Math.max(0, parseInt(document.getElementById('gridX').value) || 0), ny = Math.max(0, parseInt(document.getElementById('gridY').value) || 0);
+        const sc = (nc !== cols || nr !== rows); cols = nc; rows = nr; gridX = nx; gridY = ny; setupEditor(); drawBg();
+        if (simRunning) { setupSim(); drawSimBg(); drawSimBlocks(); drawSimHover(); }
+        if (sc) resetGrid(); else edDraw(); updateOutput();
+      }
+      ['cols', 'rows', 'gridX', 'gridY'].forEach(id => document.getElementById(id).addEventListener('change', onParamChange));
+      document.getElementById('clearBtn').addEventListener('click', resetGrid);
+      document.getElementById('randomBtn').addEventListener('click', () => { for (let i = 0; i < grid.length; i++)grid[i] = Math.floor(Math.random() * 4) + 1; edDraw(); updateOutput(); syncSim(); });
+
+      // ========== SIMULATOR ==========
+      let simGrid = [], simRunning = false, simHover = null, simHistory = [], simClears = [], simScore = 0;
+      const simLog = document.getElementById('simLog');
+      function updateSimLog() {
+        if (!simClears.length) { simLog.value = ''; return; }
+        const lines = simClears.map((entry, i) => {
+          const coords = entry.cells.map(([r, c]) => '(' + c + ',' + r + ')').join(' ');
+          const n = entry.cells.length;
+          return 'Clear ' + (i + 1) + ': type=' + entry.type + ' x' + n + ' +' + (n * n) + ' (score=' + entry.scoreAfter + ') ' + coords;
+        });
+        simLog.value = lines.join('\n');
+        simLog.scrollTop = simLog.scrollHeight;
+      }
+      function resetSimLog() { simClears = []; simScore = 0; updateSimLog(); }
+      function simStatus(extra) {
+        const cnt = simGrid.reduce((a, v) => a + (v ? 1 : 0), 0);
+        const base = cnt === 0 ? 'All cleared!' : cnt + ' blocks — click groups of 2+ to clear';
+        simInfo.textContent = base + ' · score: ' + simScore + (extra ? ' ' + extra : '');
+      }
+      const simBg = document.getElementById('simBgCanvas'), simBlk = document.getElementById('simBlockCanvas'),
+        simHov = document.getElementById('simHoverCanvas'), simWrap = document.getElementById('simWrap'),
+        simInfo = document.getElementById('simInfo');
+
+      function setupSim() {
+        const gw = cols * CELL, gh = rows * CELL;
+        [simBg, simBlk, simHov].forEach(c => { c.width = gw; c.height = gh; c.style.width = gw + 'px'; c.style.height = gh + 'px'; c.style.left = '0'; c.style.top = '0'; });
+        simWrap.style.width = gw + 'px'; simWrap.style.height = gh + 'px';
+      }
+      function drawSimBg() { const ctx = simBg.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.clearRect(0, 0, simBg.width, simBg.height); if (bgImage) ctx.drawImage(bgImage, -gridX * CELL, -gridY * CELL, SCR_W, SCR_H); }
+      function drawSimBlocks() {
+        const ctx = simBlk.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.clearRect(0, 0, simBlk.width, simBlk.height); ctx.globalAlpha = 0.85;
+        for (let r = 0; r < rows; r++)for (let c = 0; c < cols; c++) { const v = simGrid[r * cols + c]; if (v > 0 && v <= 4) ctx.drawImage(blockImg[v], c * CELL, r * CELL, CELL, CELL); }
+        ctx.globalAlpha = 1;
+      }
+      function drawSimHover() {
+        const ctx = simHov.getContext('2d'); ctx.clearRect(0, 0, simHov.width, simHov.height);
+        if (!simRunning || !simHover) return;
+        // Highlight the flood-fill group under cursor
+        const { r, c } = simHover, v = simGrid[r * cols + c]; if (v === 0) return;
+        const group = floodFill(simGrid, r, c, v); if (group.length < 2) return;
+        ctx.fillStyle = 'rgba(255,255,0,0.35)';
+        group.forEach(([gr, gc]) => ctx.fillRect(gc * CELL, gr * CELL, CELL, CELL));
+      }
+
+      // Flood fill: returns array of [r,c] for connected same-type cells
+      function floodFill(g, sr, sc, type) {
+        const visited = new Set(), result = [], q = [[sr, sc]]; visited.add(sr * cols + sc);
+        while (q.length) {
+          const [r, c] = q.shift(); result.push([r, c]);
+          [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].forEach(([nr, nc]) => { if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) { const i = nr * cols + nc; if (!visited.has(i) && g[i] === type) { visited.add(i); q.push([nr, nc]); } } });
+        }
+        return result;
+      }
+
+      // Gravity: blocks fall down within each column
+      function applyGravity(g) {
+        for (let c = 0; c < cols; c++) {
+          let write = rows - 1;
+          for (let r = rows - 1; r >= 0; r--) { if (g[r * cols + c] !== 0) { g[write * cols + c] = g[r * cols + c]; if (write !== r) g[r * cols + c] = 0; write--; } }
+          for (let r = write; r >= 0; r--)g[r * cols + c] = 0;
+        }
+      }
+
+      // Compact: shift non-empty columns left
+      function compactCols(g) {
+        let write = 0;
+        for (let c = 0; c < cols; c++) {
+          let empty = true; for (let r = 0; r < rows; r++)if (g[r * cols + c] !== 0) { empty = false; break; }
+          if (!empty) { if (write !== c) for (let r = 0; r < rows; r++) { g[r * cols + write] = g[r * cols + c]; g[r * cols + c] = 0; } write++; }
+        }
+      }
+
+      function simCell(e) { const rect = simBlk.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top, c = Math.floor(x / CELL), r = Math.floor(y / CELL); return (c >= 0 && c < cols && r >= 0 && r < rows) ? { r, c } : null; }
+
+      simBlk.parentElement.addEventListener('click', e => {
+        if (!simRunning) return;
+        // Click target might be simHov (topmost) — use simHov's rect
+        const rect = simHov.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top;
+        const c = Math.floor(x / CELL), r = Math.floor(y / CELL);
+        if (c < 0 || c >= cols || r < 0 || r >= rows) return;
+        const v = simGrid[r * cols + c]; if (v === 0) return;
+        const group = floodFill(simGrid, r, c, v); if (group.length < 2) return;
+        simHistory.push({ grid: simGrid.slice(), score: simScore });
+        const n = group.length;
+        simScore += n * n;
+        // Clear group
+        group.forEach(([gr, gc]) => { simGrid[gr * cols + gc] = 0; });
+        applyGravity(simGrid);
+        compactCols(simGrid);
+        // Full-clear bonus (matches game_session.c: +250 when board emptied)
+        const remaining = simGrid.reduce((a, v) => a + (v ? 1 : 0), 0);
+        let bonus = '';
+        if (remaining === 0) { simScore += 250; bonus = '+250 bonus!'; }
+        simClears.push({ type: v, cells: group.map(([gr, gc]) => [gr, gc]), scoreAfter: simScore });
+        updateSimLog();
+        drawSimBlocks();
+        drawSimHover();
+        simStatus(bonus);
+      });
+
+      simWrap.addEventListener('mousemove', e => {
+        if (!simRunning) return;
+        const rect = simHov.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top;
+        const c = Math.floor(x / CELL), r = Math.floor(y / CELL);
+        const cell = (c >= 0 && c < cols && r >= 0 && r < rows) ? { r, c } : null;
+        const ch = !simHover || !cell || simHover.r !== cell.r || simHover.c !== cell.c;
+        if (ch) { simHover = cell; drawSimHover(); }
+      });
+      simWrap.addEventListener('mouseleave', () => { simHover = null; drawSimHover(); });
+
+      function syncSim() {
+        if (!simRunning) return;
+        simGrid = grid.slice(); simHistory = []; resetSimLog(); drawSimBlocks(); simHover = null; drawSimHover();
+        simStatus();
+      }
+
+      document.getElementById('simBtn').addEventListener('click', () => {
+        simGrid = grid.slice(); simHistory = []; resetSimLog(); simRunning = true; setupSim(); drawSimBg(); drawSimBlocks();
+        simStatus();
+        simWrap.style.cursor = 'pointer';
+      });
+      document.getElementById('simUndoBtn').addEventListener('click', () => {
+        if (!simRunning || !simHistory.length) return;
+        const snap = simHistory.pop();
+        simGrid = snap.grid; simScore = snap.score;
+        simClears.pop(); updateSimLog(); drawSimBlocks(); simHover = null; drawSimHover();
+        simStatus();
+      });
+      document.getElementById('simResetBtn').addEventListener('click', () => {
+        if (!simRunning) return;
+        simGrid = grid.slice(); simHistory = []; resetSimLog(); drawSimBlocks(); drawSimHover();
+        simStatus();
+      });
+
+      // ========== INIT ==========
+      // Read params from inputs (browser may have restored form values)
+      cols = Math.max(1, Math.min(20, parseInt(document.getElementById('cols').value) || 10));
+      rows = Math.max(1, Math.min(18, parseInt(document.getElementById('rows').value) || 9));
+      gridX = Math.max(0, parseInt(document.getElementById('gridX').value) || 0);
+      gridY = Math.max(0, parseInt(document.getElementById('gridY').value) || 0);
+
+      setupEditor(); setupSim();
+
+      // Restore background image from localStorage
+      {
+        const saved = localStorage.getItem('gbplacer_bg');
+        if (saved) { const img = new Image(); img.onload = () => { bgImage = img; drawBg(); drawSimBg(); }; img.src = saved; }
+        else { drawBg(); drawSimBg(); }
+      }
+
+      resetGrid(); buildPicker();
+    </script>
+  </body>
+
+</html>

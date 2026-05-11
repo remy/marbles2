@@ -197,13 +197,8 @@
               </thead>
               <tbody id="scores-fast">
                 <!-- SCORES:FAST:START -->
-                <tr>
-                  <td class="rank num">1</td>
-                  <td class="initials">DAD</td>
-                  <td class="num">2,888</td>
-                  <td>#14E6</td>
-                  <td class="num">3</td>
-                  <td class="flag" title="GB">🇬🇧</td>
+                <tr class="empty">
+                  <td colspan="6">— awaiting first entry —</td>
                 </tr>
                 <!-- SCORES:FAST:END -->
               </tbody>
@@ -252,7 +247,7 @@
           return String.fromCodePoint(...[...cc.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
         }
         function esc(s) {
-          return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+          return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
       })();
     </script>

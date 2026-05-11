@@ -18,8 +18,5 @@
   "bugs": {
     "url": "https://github.com/remy/marbles2/issues"
   },
-  "homepage": "https://github.com/remy/marbles2#readme",
-  "dependencies": {
-    "postgres": "^3.4.4"
-  }
+  "homepage": "https://github.com/remy/marbles2#readme"
 }
