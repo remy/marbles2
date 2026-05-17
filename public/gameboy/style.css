@@ -47,7 +47,7 @@ img {
 
 .wrap {
   margin: 0 auto;
-  padding: 48px 28px 72px;
+  padding: 48px 12px 72px;
 }
 
 body.page-home .wrap {
@@ -106,11 +106,23 @@ body.page-guide header.top .brand a {
   color: inherit;
 }
 
+header.top nav {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  row-gap: 8px;
+}
+
 header.top nav a {
   color: var(--mute);
   text-decoration: none;
-  margin-left: 20px;
+  white-space: nowrap;
+  /* margin-left: 20px; */
   font-size: 14px;
+  /*
+  &:first-child {
+    margin-left: 0;
+  } */
 }
 
 header.top nav a:hover {
@@ -396,6 +408,10 @@ table.scores td {
   text-align: left;
   border-bottom: 1px solid var(--rule);
   white-space: nowrap;
+
+  @media (max-width: 480px) {
+    padding: 8px 6px;
+  }
 }
 
 table.scores th {
@@ -787,4 +803,21 @@ body.page-guide .colophon {
   padding: 12px 14px;
   margin: 20px 0;
   font-size: 13px;
+}
+
+@media (max-width: 480px) {
+  .collapse {
+    display: none;
+  }
+
+  table.scores th {
+    &.name_col {
+      width: 4ch;
+    }
+
+    &.score_col,
+    &.seed_col {
+      min-width: 5ch;
+    }
+  }
 }
